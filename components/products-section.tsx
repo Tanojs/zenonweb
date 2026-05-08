@@ -129,7 +129,7 @@ function PanelPricing() {
       <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3 mb-4 sm:mb-6">
         {pricingPlans.map((plan, index) => {
           const Icon = plan.icon;
-          const waLink = `https://wa.me/6281234567890?text=Halo%20Zenon%20JPM,%20saya%20mau%20order%20Panel%20WhatsApp%20dengan%20RAM%20${plan.ram}%20seharga%20${formatPrice(plan.price)}`;
+          const waLink = `https://wa.me/6285701961876?text=Halo%20Zenon%20JPM,%20saya%20mau%20order%20Panel%20WhatsApp%20dengan%20RAM%20${plan.ram}%20seharga%20${formatPrice(plan.price)}`;
 
           return (
             <Link
