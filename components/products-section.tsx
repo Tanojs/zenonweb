@@ -31,7 +31,7 @@ const scripts: Script[] = [
     name: "Script Zenon JPM",
     badge: "SCRIPT",
     badgeColor: "bg-violet-500",
-    price: 5000,
+    price: 15000,
     rating: 5.0,
     reviews: 64,
     image: "/images/zenon-sc.jpg", // Pastikan file ini ada di public/images/
