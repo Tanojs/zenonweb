@@ -15,6 +15,7 @@ interface Script {
   rating: number;
   reviews: number;
   description: string;
+  image?: string; // Menambahkan tipe data image
   isNew?: boolean;
 }
 
@@ -33,9 +34,9 @@ const scripts: Script[] = [
     price: 5000,
     rating: 5.0,
     reviews: 64,
-    image: "/images/zenon-sc.jpg",
+    image: "/images/zenon-sc.jpg", // Pastikan file ini ada di public/images/
     description: "Script JPM fitur lumayan banyak",
-    isNew?: boolean;
+    isNew: true, // Mengaktifkan label BARU
   }
 ];
 
@@ -70,29 +71,28 @@ function ScriptCard({ script }: { script: Script }) {
   return (
     <div className="bg-zinc-900/90 border border-zinc-700/80 rounded-xl overflow-hidden hover:border-teal-400/60 transition-all hover:-translate-y-1 group">
       <div className="relative aspect-[4/3] bg-zinc-800 overflow-hidden">
-  {/* Menampilkan Gambar Produk */}
-  <img 
-    src={script.image || "/placeholder-script.jpg"} 
-    alt={script.name}
-    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-100 group-hover:opacity-100"
-  />
-  
-  {/* Overlay gradasi agar tampilan lebih mewah */}
-  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/50 to-transparent" />
+        {/* Gambar Produk - Opacity 100 agar terang */}
+        <img 
+          src={script.image || "/placeholder-script.jpg"} 
+          alt={script.name}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-100 group-hover:opacity-100"
+        />
+        
+        {/* Gradasi dihapus agar tidak gelap */}
 
-  <div className="absolute top-2 left-2 flex gap-1">
-    {script.isNew && (
-      <span className="bg-rose-500 text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded shadow-sm">
-        BARU
-      </span>
-    )}
-  </div>
-  <div className="absolute top-2 right-2">
-    <span className={`${script.badgeColor} text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded shadow-sm`}>
-      {script.badge}
-    </span>
-  </div>
-</div>
+        <div className="absolute top-2 left-2 flex gap-1">
+          {script.isNew && (
+            <span className="bg-rose-500 text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded shadow-sm">
+              BARU
+            </span>
+          )}
+        </div>
+        <div className="absolute top-2 right-2">
+          <span className={`${script.badgeColor} text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded shadow-sm`}>
+            {script.badge}
+          </span>
+        </div>
+      </div>
 
       <div className="p-3 sm:p-4">
         <h3 className="font-semibold text-white text-xs sm:text-sm mb-1 group-hover:text-teal-400 transition-colors line-clamp-1">
@@ -126,26 +126,24 @@ function ScriptCard({ script }: { script: Script }) {
 function PanelPricing() {
   return (
     <div>
-      {/* Grid untuk panel pricing - responsive */}
       <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3 mb-4 sm:mb-6">
         {pricingPlans.map((plan, index) => {
           const Icon = plan.icon;
+          const waLink = `https://wa.me/6281234567890?text=Halo%20Zenon%20JPM,%20saya%20mau%20order%20Panel%20WhatsApp%20dengan%20RAM%20${plan.ram}%20seharga%20${formatPrice(plan.price)}`;
 
-  const waLink = `https://wa.me/6281234567890?text=Halo%20Zenon%20JPM,%20saya%20mau%20order%20Panel%20WhatsApp%20dengan%20RAM%20${plan.ram}%20seharga%20${formatPrice(plan.price)}`;
-
-  return (
-    <Link
-      key={index}
-      target="_blank"
-      href={waLink}
-      className={`relative bg-zinc-900/90 border rounded-xl p-3 sm:p-4 text-center transition-all hover:-translate-y-1 hover:shadow-lg block ${
-        plan.highlight
-          ? "border-teal-400 ring-2 ring-teal-400/30 hover:shadow-teal-500/20"
-          : plan.isUnlimited
-            ? "border-amber-400 ring-2 ring-amber-400/30 col-span-2 xs:col-span-1 hover:shadow-amber-500/20"
-            : "border-zinc-700/80 hover:border-teal-400/50"
-      }`}
-    >
+          return (
+            <Link
+              key={index}
+              target="_blank"
+              href={waLink}
+              className={`relative bg-zinc-900/90 border rounded-xl p-3 sm:p-4 text-center transition-all hover:-translate-y-1 hover:shadow-lg block ${
+                plan.highlight
+                  ? "border-teal-400 ring-2 ring-teal-400/30 hover:shadow-teal-500/20"
+                  : plan.isUnlimited
+                    ? "border-amber-400 ring-2 ring-amber-400/30 col-span-2 xs:col-span-1 hover:shadow-amber-500/20"
+                    : "border-zinc-700/80 hover:border-teal-400/50"
+              }`}
+            >
               {plan.label && (
                 <div className="absolute -top-2.5 sm:-top-3 left-1/2 -translate-x-1/2">
                   <span
@@ -187,7 +185,6 @@ function PanelPricing() {
         })}
       </div>
 
-      {/* Features Box */}
       <div className="bg-zinc-900/90 border border-zinc-700/80 rounded-xl p-4 sm:p-6">
         <h3 className="text-sm sm:text-base font-semibold text-white mb-3 sm:mb-4 text-center">
           Semua Paket Termasuk:
@@ -203,9 +200,6 @@ function PanelPricing() {
           ))}
         </div>
       </div>
-      <p className="text-center text-zinc-500 text-[10px] sm:text-xs mt-3 sm:mt-4">
-        * Pembayaran via Transfer Bank, QRIS, atau E-Wallet
-      </p>
     </div>
   );
 }
@@ -222,7 +216,6 @@ export function ProductsSection() {
   return (
     <section id="products" className="py-8 sm:py-10 lg:py-12 px-3 sm:px-4 lg:px-6">
       <div className="max-w-6xl mx-auto">
-        {/* Category Tabs */}
         <div className="flex flex-wrap gap-2 mb-6 sm:mb-8">
           {categories.map((cat) => (
             <button
@@ -239,7 +232,6 @@ export function ProductsSection() {
           ))}
         </div>
 
-        {/* Section Title */}
         <div className="mb-4 sm:mb-6">
           <h2 className="text-xs sm:text-sm text-zinc-400 uppercase tracking-wider font-medium">
             {activeCategory === "semua"
@@ -251,7 +243,6 @@ export function ProductsSection() {
           </h2>
         </div>
 
-        {/* Panel Section */}
         {(activeCategory === "semua" || activeCategory === "panel") && (
           <div className="mb-8 sm:mb-10">
             {activeCategory === "semua" && (
@@ -264,7 +255,6 @@ export function ProductsSection() {
           </div>
         )}
 
-        {/* Script Section */}
         {(activeCategory === "semua" || activeCategory === "script") && (
           <div>
             {activeCategory === "semua" && (
