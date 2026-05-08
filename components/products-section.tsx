@@ -126,7 +126,7 @@ function ScriptCard({ script }: { script: Script }) {
   <img 
     src={script.image || "/placeholder-script.jpg"} 
     alt={script.name}
-    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-100 group-hover:opacity-100"
   />
   
   {/* Overlay gradasi agar tampilan lebih mewah */}
