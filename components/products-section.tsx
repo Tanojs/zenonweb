@@ -35,6 +35,7 @@ const scripts: Script[] = [
     reviews: 64,
     image: "/images/zenon-sc.jpg",
     description: "Script JPM fitur lumayan banyak",
+    isNew?: boolean;
   }
 ];
 
