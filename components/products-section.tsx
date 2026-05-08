@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Star, Check, Crown, Zap, Code, Server } from "lucide-react";
+// Tambahan: Import Smartphone icon untuk bagian App
+import { Star, Check, Crown, Zap, Code, Server, Smartphone } from "lucide-react";
 import Link from "next/link";
 
-type Category = "semua" | "panel" | "script";
+// 1. Tambahkan "app" ke tipe Category
+type Category = "semua" | "panel" | "script" | "app";
 
 interface Script {
   id: number;
@@ -15,14 +17,16 @@ interface Script {
   rating: number;
   reviews: number;
   description: string;
-  image?: string; // Menambahkan tipe data image
+  image?: string; 
   isNew?: boolean;
 }
 
+// 2. Tambahkan objek "App" ke daftar kategori
 const categories = [
   { id: "semua", label: "Semua" },
   { id: "panel", label: "Panel" },
   { id: "script", label: "Script" },
+  { id: "app", label: "App" },
 ];
 
 const scripts: Script[] = [
@@ -34,9 +38,25 @@ const scripts: Script[] = [
     price: 15000,
     rating: 5.0,
     reviews: 64,
-    image: "/images/zenon-sc.jpg", // Pastikan file ini ada di public/images/
+    image: "/images/zenon-sc.jpg", 
     description: "Script JPM fitur lumayan banyak",
-    isNew: true, // Mengaktifkan label BARU
+    isNew: true, 
+  }
+];
+
+// 3. Tambahan: Buat data produk khusus untuk "App"
+const apps: Script[] = [
+  {
+    id: 101, // Pastikan ID berbeda dari script
+    name: "Aplikasi Kasir Pro",
+    badge: "APP",
+    badgeColor: "bg-blue-500",
+    price: 50000,
+    rating: 4.9,
+    reviews: 24,
+    image: "/images/app-placeholder.jpg", // Ganti dengan path gambarmu
+    description: "Aplikasi manajemen kasir lengkap dengan fitur laporan harian.",
+    isNew: true,
   }
 ];
 
@@ -71,14 +91,11 @@ function ScriptCard({ script }: { script: Script }) {
   return (
     <div className="bg-zinc-900/90 border border-zinc-700/80 rounded-xl overflow-hidden hover:border-teal-400/60 transition-all hover:-translate-y-1 group">
       <div className="relative aspect-[4/3] bg-zinc-800 overflow-hidden">
-        {/* Gambar Produk - Opacity 100 agar terang */}
         <img 
           src={script.image || "/placeholder-script.jpg"} 
           alt={script.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-100 group-hover:opacity-100"
         />
-        
-        {/* Gradasi dihapus agar tidak gelap */}
 
         <div className="absolute top-2 left-2 flex gap-1">
           {script.isNew && (
@@ -112,7 +129,7 @@ function ScriptCard({ script }: { script: Script }) {
         <div className="flex items-center justify-between gap-2">
           <div className="text-teal-400 font-bold text-sm sm:text-base">{formatPrice(script.price)}</div>
           <Link
-            href={`/checkout?type=script&id=${script.id}&name=${encodeURIComponent(script.name)}&price=${script.price}`}
+            href={`/checkout?type=${script.badge.toLowerCase()}&id=${script.id}&name=${encodeURIComponent(script.name)}&price=${script.price}`}
             className="bg-teal-500 hover:bg-teal-400 text-black text-[10px] sm:text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors shadow-lg shadow-teal-500/20"
           >
             Order
@@ -207,10 +224,13 @@ function PanelPricing() {
 export function ProductsSection() {
   const [activeCategory, setActiveCategory] = useState<Category>("semua");
 
+  // 4. Update logika perhitungan jumlah item
   const getItemCount = () => {
-    if (activeCategory === "semua") return scripts.length + pricingPlans.length;
+    if (activeCategory === "semua") return scripts.length + pricingPlans.length + apps.length;
     if (activeCategory === "panel") return pricingPlans.length;
-    return scripts.length;
+    if (activeCategory === "script") return scripts.length;
+    if (activeCategory === "app") return apps.length;
+    return 0;
   };
 
   return (
@@ -238,7 +258,9 @@ export function ProductsSection() {
               ? "Semua Produk"
               : activeCategory === "panel"
                 ? "Panel WhatsApp"
-                : "Script Bot WA"}{" "}
+                : activeCategory === "script"
+                  ? "Script Bot WA"
+                  : "Aplikasi"}{" "}
             <span className="text-teal-400">({getItemCount()})</span>
           </h2>
         </div>
@@ -256,7 +278,7 @@ export function ProductsSection() {
         )}
 
         {(activeCategory === "semua" || activeCategory === "script") && (
-          <div>
+          <div className="mb-8 sm:mb-10">
             {activeCategory === "semua" && (
               <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-5 mt-8 sm:mt-10 flex items-center gap-2">
                 <Code className="w-5 h-5 text-teal-400" />
@@ -266,6 +288,23 @@ export function ProductsSection() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
               {scripts.map((script) => (
                 <ScriptCard key={script.id} script={script} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 5. Tambahan: Render bagian produk APP */}
+        {(activeCategory === "semua" || activeCategory === "app") && (
+          <div>
+            {activeCategory === "semua" && (
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-5 mt-8 sm:mt-10 flex items-center gap-2">
+                <Smartphone className="w-5 h-5 text-teal-400" />
+                Aplikasi
+              </h3>
+            )}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+              {apps.map((app) => (
+                <ScriptCard key={app.id} script={app} />
               ))}
             </div>
           </div>
