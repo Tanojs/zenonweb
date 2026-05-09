@@ -44,18 +44,18 @@ const scripts: Script[] = [
   }
 ];
 
-// 3. Tambahan: Buat data produk khusus untuk "App"
+
 const apps: Script[] = [
   {
     id: 101, // Pastikan ID berbeda dari script
-    name: "Aplikasi Kasir Pro",
+    name: "ALIGHT MOTION",
     badge: "APP",
     badgeColor: "bg-blue-500",
-    price: 50000,
+    price: 5000,
     rating: 4.9,
     reviews: 24,
-    image: "/images/app-placeholder.jpg", // Ganti dengan path gambarmu
-    description: "Aplikasi manajemen kasir lengkap dengan fitur laporan harian.",
+    image: "/images/alightmotion.jpg",
+    description: "Akun alight motion pro 1 tahun.",
     isNew: true,
   }
 ];
