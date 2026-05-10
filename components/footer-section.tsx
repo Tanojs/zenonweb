@@ -3,8 +3,8 @@
 import { Zap } from "lucide-react";
 import Link from "next/link";
 
-const WHATSAPP_NUMBER = "6281234567890";
-const WHATSAPP_CHANNEL = "https://whatsapp.com/channel/xxxxx";
+const WHATSAPP_NUMBER = "6285701961876";
+const WHATSAPP_CHANNEL = "https://whatsapp.com/channel/0029VbCUCFf5a24DCL3z4W40";
 
 export function FooterSection() {
   const currentYear = new Date().getFullYear();
