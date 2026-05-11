@@ -43,7 +43,7 @@ export function FooterSection() {
           
 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20 overflow-hidden">
   <img 
-    src="images/logo.png" 
+    src="/images/logo.png" 
     className="w-4 h-4 sm:w-5 sm:h-5 object-contain" 
   />
 </div>
