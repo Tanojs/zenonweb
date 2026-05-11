@@ -9,21 +9,21 @@ const SLIDES = [
   {
     category: "PANEL PTERODACTYL",
     title: <>HOSTING <span className="text-teal-400">PREMIUM</span></>,
-    desc: "Panel performa tinggi untuk bot & game server tanpa delay. Layanan kami menjamin uptime maksimal dengan harga yang sangat terjangkau untuk semua kalangan gamer.",
+    desc: "Panel Pterodactyl dengan VPS legal premium, server stabil, performa cepat, uptime aman, dan online 24/7 nonstop.",
     bg: "/images/zenon-sc.jpg",
     target: "#panel"
   },
   {
-    category: "SCRIPT BOT WA",
-    title: <>BOT <span className="text-teal-400">OTOMATIS</span></>,
-    desc: "Script bot WhatsApp fitur terlengkap 24 jam. Dilengkapi dengan fitur antispam, broadcast, dan manajemen grup otomatis yang sangat mudah digunakan oleh siapapun.",
+    category: "SOURCE CODE",
+    title: <>SC <span className="text-teal-400">BOT</span></>,
+    desc: "Source code premium dengan fitur lengkap, ringan, aman, dan mudah digunakan.",
     bg: "/images/zenon-sc.jpg",
     target: "#script"
   },
   {
-    category: "MOBILE APP",
+    category: "APP",
     title: <>APP <span className="text-teal-400">PREMIUM</span></>,
-    desc: "Aplikasi Android & iOS premium untukmu. Nikmati akses fitur pro tanpa batas untuk meningkatkan produktivitas harian kamu dengan harga langganan yang sangat murah.",
+    desc: "Aplikasi premium murah.",
     bg: "/images/zenon-sc.jpg",
     target: "#app"
   }
