@@ -40,16 +40,18 @@ export function FooterSection() {
             </a>
           </div>
 
-          
-<div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20 overflow-hidden">
-  <img 
-    src="/images/logo.png" 
-    className="w-4 h-4 sm:w-5 sm:h-5 object-contain" 
-  />
-</div>
-
+          {/* Logo Section - Sekarang sudah rapi pembungkusnya */}
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20 overflow-hidden">
+              <img 
+                src="/images/logo.png" 
+                alt="Logo"
+                className="w-3 h-3 sm:w-4 sm:h-4 object-contain" 
+              />
+            </div>
             <span className="text-xs sm:text-sm text-zinc-300 font-medium">ZenonStore</span>
           </div>
+
         </div>
       </div>
     </footer>
