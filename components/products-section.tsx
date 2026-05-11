@@ -71,11 +71,12 @@ const pricingPlans = [
 ];
 
 const panelFeatures = [
-  "Panel Full Access",
-  "Auto Reply & Bot Features",
-  "Broadcast Tanpa Batas",
-  "Multi Device Support",
-  "Dashboard Analytics",
+  "Cpu stabil",
+  "VPS legal & stabil",
+  "Server fast & anti delay",
+  "Uptime 24/7",
+  "Anti suspend",
+  "Garansi aktif 20hari",
   "Technical Support 24/7",
 ];
 
