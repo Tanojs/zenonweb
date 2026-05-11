@@ -25,7 +25,7 @@ export function Navbar() {
   <img 
     src="images/logo.png" 
     alt="Logo Zenon" 
-    className="w-7 h-7 sm:w-8 sm:h-8 object-contain" 
+    className="w-6 h-6 sm:w-7 sm:h-7 object-contain" 
   />
 </div>
             <span className="font-bold text-white text-base sm:text-lg">ZenonStore</span>
