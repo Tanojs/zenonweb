@@ -74,17 +74,17 @@ export function HeroSection() {
                   className="flex-[0_0_100%] min-w-0 relative h-[260px] sm:h-[350px] flex items-center p-6 sm:p-12" 
                   key={index}
                 >
-                  {/* FOTO DIAM (TIDAK ZOOM) */}
+                  {/* FOTO BERSIH (TANPA ZOOM) */}
                   <img 
                     src={slide.bg} 
-                    className="absolute inset-0 w-full h-full object-cover opacity-90 z-0 scale-100" 
+                    className="absolute inset-0 w-full h-full object-cover z-0 scale-100" 
                     alt="" 
                   />
                   
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-1" />
+                  {/* FIX: GRADIENT DIHAPUS, DIGANTI OVERLAY RATA TIPIS BIAR GAK ADA BAGIAN GELAP */}
+                  <div className="absolute inset-0 bg-black/30 z-1" />
 
                   <div className="relative z-10 w-full">
-                    {/* 1. Badge (delay-300) */}
                     <div className={`transition-all duration-700 delay-300 ${selectedIndex === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                       <div className="inline-flex items-center gap-1.5 bg-teal-500/20 border border-teal-500/30 rounded-md px-2 py-0.5 mb-2.5">
                         <Zap className="w-3 h-3 text-teal-400 fill-teal-400 shadow-[0_0_5px_#14b8a6]" />
@@ -92,17 +92,14 @@ export function HeroSection() {
                       </div>
                     </div>
                     
-                    {/* 2. Judul (delay-500) */}
                     <h1 className={`text-2xl sm:text-4xl font-black text-white mb-2 italic tracking-tighter uppercase leading-tight drop-shadow-md transition-all duration-700 delay-500 ${selectedIndex === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                       {slide.title}
                     </h1>
                     
-                    {/* 3. Deskripsi (delay-700) - Muat 20 Kata */}
                     <p className={`text-zinc-200 text-[10px] sm:text-[13px] mb-6 max-w-[280px] sm:max-w-md italic font-light line-clamp-3 leading-relaxed transition-all duration-700 delay-700 ${selectedIndex === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                       {slide.desc}
                     </p>
                     
-                    {/* 4. Tombol (delay-1000) */}
                     <div className={`transition-all duration-700 delay-1000 ${selectedIndex === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                       <Link href={slide.target} className="inline-flex items-center gap-2 bg-teal-500 hover:bg-teal-400 text-black px-5 py-2.5 rounded-xl font-black text-[11px] uppercase transition-all shadow-lg active:scale-95">
                         LIHAT <ChevronRight className="w-4 h-4" />
@@ -114,7 +111,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* --- PAGINATION DOTS (FINAL: LEBIH KECIL & CLEAN) --- */}
+          {/* --- PAGINATION DOTS (BERSIH & KECIL) --- */}
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
             {SLIDES.map((_, index) => (
               <button
