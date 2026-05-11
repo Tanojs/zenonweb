@@ -2,7 +2,7 @@
 
 import React from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronRight, MessageCircle, Zap, Shield, Users, Rocket } from "lucide-react";
+import { ChevronRight, MessageCircle, Server, Code, Smartphone, Zap } from "lucide-react";
 import Link from "next/link";
 
 const SLIDES = [
@@ -29,14 +29,14 @@ export function HeroSection() {
     <section className="pt-16 pb-6 px-3 sm:px-6 bg-zinc-950">
       <div className="max-w-6xl mx-auto">
         
-        {/* --- CONTAINER UTAMA (BANNER HITAM) --- */}
-        <div className="relative rounded-3xl overflow-hidden border border-zinc-800 bg-zinc-900/40 shadow-2xl p-4 sm:p-6">
+        {/* --- BANNER AREA (YANG DIUBAH) --- */}
+        <div className="relative rounded-3xl overflow-hidden border border-zinc-800 bg-zinc-900/40 shadow-2xl p-4 sm:p-6 mb-6">
           
-          {/* SLIDER AREA */}
-          <div className="overflow-hidden mb-4" ref={emblaRef}>
+          {/* SLIDER UTAMA */}
+          <div className="overflow-hidden mb-6" ref={emblaRef}>
             <div className="flex">
               {SLIDES.map((slide, index) => (
-                <div className="flex-[0_0_100%] min-w-0 relative h-[240px] sm:h-[320px] flex items-center p-6" key={index}>
+                <div className="flex-[0_0_100%] min-w-0 relative h-[240px] sm:h-[320px] flex items-center p-4 sm:p-8" key={index}>
                   <img src={slide.bg} className="absolute inset-0 w-full h-full object-cover opacity-20" alt="" />
                   <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent z-1" />
 
@@ -50,10 +50,10 @@ export function HeroSection() {
                     </h1>
                     <p className="text-zinc-400 text-[11px] sm:text-sm mb-6 max-w-sm line-clamp-2">{slide.desc}</p>
                     <div className="flex gap-3">
-                      <Link href={slide.target} className="bg-teal-500 text-black px-5 py-2 rounded-xl font-black text-[11px] uppercase flex items-center gap-2">
+                      <Link href={slide.target} className="bg-teal-500 hover:bg-teal-400 text-black px-6 py-2.5 rounded-xl font-black text-[11px] uppercase flex items-center gap-2 transition-all">
                         BELI SEKARANG <ChevronRight className="w-4 h-4" />
                       </Link>
-                      <a href="https://wa.me/6285701961876" className="bg-zinc-800/50 border border-zinc-700 text-white px-5 py-2 rounded-xl font-bold text-[11px] flex items-center gap-2">
+                      <a href="https://wa.me/6285701961876" className="bg-zinc-800/50 border border-zinc-700 text-white px-6 py-2.5 rounded-xl font-bold text-[11px] flex items-center gap-2 transition-all">
                         <MessageCircle className="w-4 h-4" /> CHAT
                       </a>
                     </div>
@@ -63,44 +63,42 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* --- 4 KOTAK DI DALAM BANNER --- */}
+          {/* --- 4 KOTAK PRODUK DI DALAM BANNER (YANG LU MAU) --- */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 relative z-20">
-            {/* Kotak 1: Promo Kalimat Menarik */}
-            <div className="bg-gradient-to-br from-teal-500/20 to-teal-500/5 border border-teal-500/30 rounded-2xl p-3 flex flex-col justify-center shadow-inner">
+            {/* Kotak Promo */}
+            <div className="bg-gradient-to-br from-teal-500/20 to-zinc-900 border border-teal-500/30 rounded-2xl p-3 flex flex-col justify-center">
               <div className="flex items-center gap-1.5 mb-1">
-                <Rocket className="w-3 h-3 text-teal-400" />
+                <Zap className="w-3 h-3 text-teal-400" />
                 <span className="text-[9px] font-black text-teal-400 uppercase italic">Special Offer</span>
               </div>
               <p className="text-[10px] sm:text-xs text-white font-black leading-tight uppercase italic">
-                Sistem <span className="text-teal-400">Otomatis</span> - Bayar Langsung Aktif!
+                SISTEM <span className="text-teal-400">OTOMATIS</span> - BAYAR LANGSUNG AKTIF!
               </p>
             </div>
 
-            {/* Kotak 2: Pengguna */}
-            <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-2xl p-3 flex flex-col items-center justify-center text-center">
-              <Users className="w-4 h-4 text-teal-400 mb-1" />
-              <div className="text-sm sm:text-lg font-black text-white italic">5000+</div>
-              <div className="text-[8px] text-zinc-500 font-bold uppercase tracking-tighter">Pengguna</div>
-            </div>
+            {/* Kotak Cloud Panel */}
+            <Link href="#panel" className="bg-zinc-800/40 border border-zinc-700/50 rounded-2xl p-3 flex flex-col items-center justify-center text-center group hover:border-teal-500/50 transition-all">
+              <Server className="w-5 h-5 text-teal-400 mb-1 group-hover:scale-110 transition-transform" />
+              <div className="text-[11px] font-black text-white uppercase italic leading-none">Cloud Panel</div>
+              <div className="text-[8px] text-zinc-500 font-bold uppercase mt-1">Mulai Rp1.000</div>
+            </Link>
 
-            {/* Kotak 3: Uptime */}
-            <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-2xl p-3 flex flex-col items-center justify-center text-center">
-              <Zap className="w-4 h-4 text-teal-400 mb-1" />
-              <div className="text-sm sm:text-lg font-black text-white italic">99.9%</div>
-              <div className="text-[8px] text-zinc-500 font-bold uppercase tracking-tighter">Uptime</div>
-            </div>
+            {/* Kotak Script Bot */}
+            <Link href="#script" className="bg-zinc-800/40 border border-zinc-700/50 rounded-2xl p-3 flex flex-col items-center justify-center text-center group hover:border-teal-500/50 transition-all">
+              <Code className="w-5 h-5 text-teal-400 mb-1 group-hover:scale-110 transition-transform" />
+              <div className="text-[11px] font-black text-white uppercase italic leading-none">Script Bot</div>
+              <div className="text-[8px] text-zinc-500 font-bold uppercase mt-1">Best Features</div>
+            </Link>
 
-            {/* Kotak 4: Support */}
-            <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-2xl p-3 flex flex-col items-center justify-center text-center">
-              <Shield className="w-4 h-4 text-teal-400 mb-1" />
-              <div className="text-sm sm:text-lg font-black text-white italic">24/7</div>
-              <div className="text-[8px] text-zinc-500 font-bold uppercase tracking-tighter">Support</div>
-            </div>
+            {/* Kotak Premium App */}
+            <Link href="#app" className="bg-zinc-800/40 border border-zinc-700/50 rounded-2xl p-3 flex flex-col items-center justify-center text-center group hover:border-teal-500/50 transition-all">
+              <Smartphone className="w-5 h-5 text-teal-400 mb-1 group-hover:scale-110 transition-transform" />
+              <div className="text-[11px] font-black text-white uppercase italic leading-none">Premium App</div>
+              <div className="text-[8px] text-zinc-500 font-bold uppercase mt-1">Trusted App</div>
+            </Link>
           </div>
-
         </div>
 
-        {/* Kotak Stats di luar banner (yang kamu kirim di gambar terakhir) biarin tetap ada di bawahnya */}
       </div>
     </section>
   );
