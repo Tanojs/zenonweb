@@ -253,7 +253,7 @@ export function ProductsSection() {
               : activeCategory === "panel"
                 ? "Panel"
                 : activeCategory === "script"
-                  ? "Script Bot WA"
+                  ? "Source Code"
                   : "Aplikasi"}{" "}
             <span className="text-teal-400">({getItemCount()})</span>
           </h2>
