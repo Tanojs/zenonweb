@@ -17,7 +17,7 @@ const SLIDES = [
     category: "SCRIPT BOT WA",
     title: <>BOT <span className="text-teal-400">OTOMATIS</span></>,
     desc: "Script bot WhatsApp fitur terlengkap 24 jam.",
-    bg: "/images/hero-2.jpg",
+    bg: "/images/zenon-sc.jpg",
     target: "#script"
   }
 ];
