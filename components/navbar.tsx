@@ -21,9 +21,13 @@ export function Navbar() {
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
-            </div>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20 overflow-hidden">
+  <img 
+    src="images/logo.png" 
+    alt="Logo Zenon" 
+    className="w-5 h-5 sm:w-6 sm:h-6 object-contain" 
+  />
+</div>
             <span className="font-bold text-white text-base sm:text-lg">ZenonStore</span>
           </Link>
 
