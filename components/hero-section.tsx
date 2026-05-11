@@ -65,12 +65,22 @@ export function HeroSection() {
     <section className="pt-20 pb-4 px-3 sm:px-6 bg-zinc-950">
       <div className="max-w-6xl mx-auto">
         
+        {/* --- BANNER AREA --- */}
         <div className="relative rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900 shadow-xl mb-3">
           <div className="overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing" ref={emblaRef}>
             <div className="flex">
               {SLIDES.map((slide, index) => (
-                <div className="flex-[0_0_100%] min-w-0 relative h-[260px] sm:h-[350px] flex items-center p-6 sm:p-12" key={index}>
-                  <img src={slide.bg} className="absolute inset-0 w-full h-full object-cover opacity-90 z-0 scale-100" alt="" />
+                <div 
+                  className="flex-[0_0_100%] min-w-0 relative h-[260px] sm:h-[350px] flex items-center p-6 sm:p-12" 
+                  key={index}
+                >
+                  {/* FOTO DIAM (TIDAK ZOOM) */}
+                  <img 
+                    src={slide.bg} 
+                    className="absolute inset-0 w-full h-full object-cover opacity-90 z-0 scale-100" 
+                    alt="" 
+                  />
+                  
                   <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-1" />
 
                   <div className="relative z-10 w-full">
@@ -104,22 +114,22 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* --- PAGINATION DOTS (SMOOTH FLUID) --- */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+          {/* --- PAGINATION DOTS (FINAL: LEBIH KECIL & CLEAN) --- */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
             {SLIDES.map((_, index) => (
               <button
                 key={index}
                 onClick={() => scrollTo(index)}
-                className="group relative flex items-center h-4 focus:outline-none"
+                className="group relative flex items-center focus:outline-none"
                 style={{
-                  width: selectedIndex === index ? "32px" : "10px",
-                  transition: "width 0.6s cubic-bezier(0.22, 1, 0.36, 1)"
+                  width: selectedIndex === index ? "20px" : "6px",
+                  transition: "width 0.5s cubic-bezier(0.4, 0, 0.2, 1)"
                 }}
               >
                 <div 
-                  className={`h-1.5 w-full rounded-full transition-all duration-500 ${
+                  className={`h-1 w-full rounded-full transition-all duration-500 ${
                     selectedIndex === index 
-                      ? "bg-teal-500 shadow-[0_0_12px_rgba(20,184,166,0.6)]" 
+                      ? "bg-teal-500 shadow-[0_0_8px_rgba(20,184,166,0.6)]" 
                       : "bg-white/20 group-hover:bg-white/40"
                   }`} 
                 />
