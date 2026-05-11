@@ -278,7 +278,7 @@ export function ProductsSection() {
             {activeCategory === "semua" && (
               <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-5 mt-8 sm:mt-10 flex items-center gap-2">
                 <Code className="w-5 h-5 text-teal-400" />
-                Script Bot WA
+                Source Code
               </h3>
             )}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 text-zinc-100">
