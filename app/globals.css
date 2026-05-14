@@ -33,10 +33,28 @@ body {
   font-family: var(--font-sans);
 }
 
-html {
-  scroll-behavior: smooth;
+/* SETUP LENIS SMOOTH SCROLL */
+html.lenis, html.lenis body {
+  height: auto;
 }
 
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important; /* WAJIB: Matikan smooth bawaan browser */
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* SCROLLBAR CUSTOM */
 ::-webkit-scrollbar {
   width: 6px;
 }
