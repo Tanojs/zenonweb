@@ -17,6 +17,7 @@ interface Script {
   description: string;
   image?: string; 
   isNew?: boolean;
+  features: string[]; // Tambahkan ini agar tidak error
 }
 
 const categories = [
@@ -37,7 +38,8 @@ const scripts: Script[] = [
     reviews: 64,
     image: "/images/zenon-sc.jpg", 
     description: "Script JPM fitur lumayan banyak",
-    isNew: true, 
+    isNew: true,
+    features: ["Auto Push Kontak", "Anti Delay", "Support Group/Privat"], // Isi fiturnya di sini
   }
 ];
 
@@ -53,6 +55,7 @@ const apps: Script[] = [
     image: "/images/alightmotion.jpg",
     description: "Akun alight motion pro 1 tahun.",
     isNew: true,
+    features: ["Aktif 1 Tahun", "No Watermark", "Full Preset"], // Isi detail app di sini
   }
 ];
 
@@ -86,7 +89,7 @@ function formatPrice(price: number): string {
 
 function ScriptCard({ script }: { script: Script }) {
   return (
-    <div className="bg-zinc-900/90 border border-zinc-700/80 rounded-xl overflow-hidden hover:border-teal-400/60 transition-all hover:-translate-y-1 group">
+    <div className="bg-zinc-900/90 border border-zinc-700/80 rounded-xl overflow-hidden hover:border-teal-400/60 transition-all hover:-translate-y-1 group flex flex-col h-full">
       <div className="relative aspect-[4/3] bg-zinc-800 overflow-hidden">
         <img 
           src={script.image || "/placeholder-script.jpg"} 
@@ -108,12 +111,23 @@ function ScriptCard({ script }: { script: Script }) {
         </div>
       </div>
 
-      <div className="p-3 sm:p-4">
+      <div className="p-3 sm:p-4 flex flex-col flex-1">
         <h3 className="font-semibold text-white text-xs sm:text-sm mb-1 group-hover:text-teal-400 transition-colors line-clamp-1">
           {script.name}
         </h3>
         <p className="text-[10px] sm:text-xs text-zinc-400 mb-2 sm:mb-3 line-clamp-2">{script.description}</p>
-        <div className="flex items-center gap-1 mb-2 sm:mb-3">
+        
+        {/* Fitur Produk */}
+        <div className="flex-1 space-y-1.5 mb-4">
+          {script.features?.map((feat, i) => (
+            <div key={i} className="flex items-center gap-1.5">
+              <Check className="w-3 h-3 text-teal-400 shrink-0" />
+              <span className="text-[9px] sm:text-[10px] text-zinc-300 line-clamp-1">{feat}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-1 mb-2 sm:mb-3 mt-auto">
           <div className="flex">
             {[...Array(5)].map((_, i) => (
               <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400" />
@@ -123,6 +137,7 @@ function ScriptCard({ script }: { script: Script }) {
             {script.rating} ({script.reviews})
           </span>
         </div>
+        
         <div className="flex items-center justify-between gap-2">
           <div className="text-teal-400 font-bold text-sm sm:text-base">{formatPrice(script.price)}</div>
           <Link
@@ -265,7 +280,7 @@ export function ProductsSection() {
             {activeCategory === "semua" && (
               <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-5 flex items-center gap-2">
                 <Server className="w-5 h-5 text-teal-400" />
-                Panel
+                Panel Hosting
               </h3>
             )}
             <PanelPricing />
@@ -295,7 +310,7 @@ export function ProductsSection() {
             {activeCategory === "semua" && (
               <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-5 mt-8 sm:mt-10 flex items-center gap-2">
                 <Smartphone className="w-5 h-5 text-teal-400" />
-                Aplikasi
+                Aplikasi Premium
               </h3>
             )}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 text-zinc-100">
