@@ -3,18 +3,17 @@
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Swal from "sweetalert2"; // Import SweetAlert2
+import withReactContent from "sweetalert2-react-content";
 import { 
   ArrowLeft, 
-  QrCode,
-  CheckCircle2,
   Loader2,
-  Shield,
-  Zap,
   UserCircle,
   X,
   Download
 } from "lucide-react";
 
+const MySwal = withReactContent(Swal);
 const WHATSAPP_NUMBER = "6285701961876";
 const QRIS_IMAGE_URL = "/images/qristano.png"; 
 
@@ -28,7 +27,6 @@ function formatPrice(price: number): string {
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
-  const [isProcessing, setIsProcessing] = useState(false);
   const [showQrisModal, setShowQrisModal] = useState(false);
   
   const [customerName, setCustomerName] = useState("");
@@ -39,7 +37,6 @@ function CheckoutContent() {
   const productName = searchParams.get("name") || "";
   const productPrice = parseInt(searchParams.get("price") || "0");
 
-  // FUNGSI DOWNLOAD (Ditaruh di sini supaya tidak eror)
   const handleDownloadQris = () => {
     const link = document.createElement("a");
     link.href = QRIS_IMAGE_URL;
@@ -50,12 +47,28 @@ function CheckoutContent() {
   };
 
   const handleShowQris = () => {
+    // Validasi menggunakan SweetAlert2
     if (!customerName || !customerPhone) {
-      alert("Mohon lengkapi Nama dan No. WhatsApp!");
+      MySwal.fire({
+        title: <span className="text-white">Waduh!</span>,
+        html: <span className="text-zinc-400 text-sm">Mohon lengkapi Nama dan No. WhatsApp dulu ya cik!</span>,
+        icon: "warning",
+        background: "#18181b", // bg-zinc-900
+        confirmButtonColor: "#14b8a6", // teal-500
+        confirmButtonText: "Oke Siap",
+      });
       return;
     }
+    
     if (productType === "panel" && !panelUsername) {
-      alert("Mohon isi Username untuk akun Panel Anda!");
+      MySwal.fire({
+        title: <span className="text-white">Username Kosong</span>,
+        html: <span className="text-zinc-400 text-sm">Mohon isi Username untuk akun Panel Anda!</span>,
+        icon: "info",
+        background: "#18181b",
+        confirmButtonColor: "#14b8a6",
+        confirmButtonText: "Sip!",
+      });
       return;
     }
     setShowQrisModal(true);
@@ -83,52 +96,57 @@ function CheckoutContent() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 py-6 sm:py-8 px-3 sm:px-4 lg:px-6 text-zinc-100">
+    <div className="min-h-screen bg-zinc-950 py-6 sm:py-8 px-3 sm:px-4 lg:px-6 text-zinc-100 font-sans">
       <div className="max-w-2xl mx-auto">
-        <Link href="/#products" className="inline-flex items-center gap-2 text-zinc-400 hover:text-teal-400 mb-6 text-sm">
+        <Link href="/#products" className="inline-flex items-center gap-2 text-zinc-400 hover:text-teal-400 mb-6 text-sm transition-colors">
           <ArrowLeft className="w-4 h-4" /> Kembali ke Produk
         </Link>
 
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-white">Checkout</h1>
-          <p className="text-zinc-400 text-sm">Scan QRIS dan Konfirmasi</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Checkout</h1>
+          <p className="text-zinc-400 text-sm">Lengkapi data & scan QRIS</p>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 mb-6">
+        {/* Card Ringkasan Produk */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 mb-6 shadow-sm">
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-white font-medium">{productType === "panel" ? `Panel ${productName}` : productName}</p>
-              <p className="text-zinc-500 text-xs mt-1 italic">Total yang harus dibayar:</p>
+              <p className="text-white font-semibold">{productType === "panel" ? `Panel ${productName}` : productName}</p>
+              <p className="text-zinc-500 text-[10px] uppercase tracking-wider mt-1 font-bold">Total Tagihan</p>
             </div>
-            <p className="text-teal-400 font-bold text-xl">{formatPrice(productPrice)}</p>
+            <p className="text-teal-400 font-black text-xl">{formatPrice(productPrice)}</p>
           </div>
         </div>
 
+        {/* Form Data Pembeli */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 mb-6 space-y-4">
-          <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Data Pembeli</h2>
+          <h2 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em]">Data Pembeli</h2>
           <input
             type="text"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
             placeholder="Nama Lengkap"
-            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-sm focus:border-teal-500 outline-none"
+            className="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-sm focus:border-teal-500 transition-colors outline-none text-white"
           />
           <input
             type="tel"
             value={customerPhone}
             onChange={(e) => setCustomerPhone(e.target.value)}
-            placeholder="No. WhatsApp (Aktif)"
-            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-sm focus:border-teal-500 outline-none"
+            placeholder="No. WhatsApp (Contoh: 0812...)"
+            className="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-sm focus:border-teal-500 transition-colors outline-none text-white"
           />
+          
           {productType === "panel" && (
-            <div className="p-3 bg-teal-500/5 border border-teal-500/20 rounded-lg">
-              <label className="flex items-center gap-2 text-xs text-teal-400 mb-2 font-bold"><UserCircle className="w-4 h-4" /> Username Panel</label>
+            <div className="p-3 bg-teal-500/5 border border-teal-500/20 rounded-lg mt-2">
+              <label className="flex items-center gap-2 text-[10px] text-teal-400 mb-2 font-black uppercase tracking-wider">
+                <UserCircle className="w-3.5 h-3.5" /> Username Panel
+              </label>
               <input
                 type="text"
                 value={panelUsername}
                 onChange={(e) => setPanelUsername(e.target.value)}
-                placeholder="Contoh: zenon"
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-sm outline-none focus:border-teal-400"
+                placeholder="Contoh: zenon_user"
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-sm outline-none focus:border-teal-400 text-white"
               />
             </div>
           )}
@@ -136,50 +154,50 @@ function CheckoutContent() {
 
         <button
           onClick={handleShowQris}
-          className="w-full py-4 rounded-xl font-bold bg-teal-500 text-black shadow-lg shadow-teal-500/20 hover:bg-teal-400 transition-all"
+          className="w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest bg-teal-500 text-black shadow-lg shadow-teal-500/10 hover:bg-teal-400 hover:-translate-y-0.5 active:scale-95 transition-all"
         >
           Bayar Sekarang
         </button>
 
+        {/* Modal QRIS */}
         {showQrisModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-            <div className="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-2xl overflow-hidden relative animate-in fade-in zoom-in duration-300">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+            <div className="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-2xl overflow-hidden relative animate-in fade-in zoom-in duration-300 shadow-2xl">
               <button 
                 onClick={() => setShowQrisModal(false)}
-                className="absolute top-3 right-3 p-2 bg-black/20 hover:bg-black/50 rounded-full text-white"
+                className="absolute top-3 right-3 p-2 bg-black/20 hover:bg-rose-500/80 rounded-full text-white transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
               
               <div className="p-6 text-center">
-                <h3 className="text-lg font-bold mb-1 text-white">Scan QRIS</h3>
-                <p className="text-zinc-400 text-xs mb-4">Silakan selesaikan pembayaran</p>
+                <h3 className="text-lg font-bold mb-1 text-white italic">SCAN QRIS</h3>
+                <p className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mb-4">Selesaikan Pembayaran</p>
                 
-                <div className="bg-white p-3 rounded-xl mb-3 inline-block shadow-lg">
-                  <img src={QRIS_IMAGE_URL} alt="QRIS ZenonStore" className="w-48 h-48 sm:w-64 sm:h-64 object-contain" />
+                <div className="bg-white p-3 rounded-xl mb-4 inline-block shadow-inner">
+                  <img src={QRIS_IMAGE_URL} alt="QRIS ZenonStore" className="w-48 h-48 sm:w-60 sm:h-60 object-contain" />
                 </div>
 
-                {/* TOMBOL UNDUH */}
                 <button
                   onClick={handleDownloadQris}
-                  className="flex items-center gap-2 mx-auto mb-5 text-teal-400 hover:text-teal-300 text-xs font-semibold transition-colors bg-teal-400/10 px-4 py-2 rounded-full border border-teal-400/20"
+                  className="flex items-center gap-2 mx-auto mb-6 text-teal-400 hover:text-teal-300 text-[10px] font-bold transition-all bg-teal-400/5 px-4 py-2 rounded-full border border-teal-400/10 hover:border-teal-400/30"
                 >
-                  <Download className="w-4 h-4" />
-                  Simpan QRIS ke Galeri
+                  <Download className="w-3.5 h-3.5" />
+                  SIMPAN KE GALERI
                 </button>
                 
-                <div className="bg-zinc-800 p-3 rounded-lg mb-6">
-                  <p className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Total Tagihan</p>
-                  <p className="text-teal-400 text-2xl font-black">{formatPrice(productPrice)}</p>
+                <div className="bg-zinc-800/80 p-3 rounded-lg mb-6 border border-zinc-700">
+                  <p className="text-zinc-500 text-[9px] uppercase font-black tracking-[0.2em]">Total Tagihan</p>
+                  <p className="text-teal-400 text-2xl font-black italic">{formatPrice(productPrice)}</p>
                 </div>
 
                 <button
                   onClick={handleConfirmWhatsApp}
-                  className="w-full py-4 rounded-xl font-bold bg-green-500 hover:bg-green-600 text-white flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"
+                  className="w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest bg-green-500 hover:bg-green-600 text-white flex items-center justify-center gap-2 shadow-lg shadow-green-500/20 active:scale-95 transition-all"
                 >
-                  Sudah Bayar? Kirim Bukti
+                  Kirim Bukti Pembayaran
                 </button>
-                <p className="text-[10px] text-zinc-500 mt-3 italic">*Lampirkan bukti transfer di WhatsApp</p>
+                <p className="text-[9px] text-zinc-500 mt-4 italic">*Admin akan memproses pesanan dalam 1-10 menit</p>
               </div>
             </div>
           </div>
