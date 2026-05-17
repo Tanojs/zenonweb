@@ -148,7 +148,7 @@ function CheckoutContent() {
                 type="text"
                 value={panelUsername}
                 onChange={(e) => setPanelUsername(e.target.value)}
-                placeholder="Contoh: zenon_user"
+                placeholder="Contoh: zenon"
                 className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-sm outline-none focus:border-teal-400"
               />
             </div>
