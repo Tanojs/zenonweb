@@ -20,7 +20,7 @@ export interface Product {
 }
 
 const categories = [
-  { id: "semua", label: "Semua Layanan" },
+  { id: "semua", label: "Semua" },
   { id: "panel", label: "Panel" },
   { id: "script", label: "Script" },
   { id: "app", label: "App" },
