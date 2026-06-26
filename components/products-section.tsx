@@ -73,7 +73,7 @@ function formatPrice(price: number): string {
   return `Rp${price.toLocaleString("id-ID")}`;
 }
 
-// Komponen Card Universal asli bawaanmu (untuk Script dan Aplikasi)
+// Komponen Card Universal untuk Script dan Aplikasi
 function ScriptCard({ script }: { script: Script }) {
   return (
     <div className="bg-card border border-border rounded-[20px] overflow-hidden shadow-xl hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 group flex flex-col h-full p-[12px] duration-300">
@@ -138,15 +138,15 @@ function ScriptCard({ script }: { script: Script }) {
   );
 }
 
-// 📦 MODIFIKASI PANEL: Menghapus list RAM dan meringkas jadi 1 Card Lebar mengarah ke Telegram
+// 📦 PERUBAHAN UTAMA: Meringkas seluruh daftar RAM menjadi satu Card Panel Pterodactyl Besar ke Telegram
 function PanelPricing() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
       
-      {/* Satu Card Utama Panel Pterodactyl */}
+      {/* Card Utama Panel Pterodactyl */}
       <div className="md:col-span-1 bg-card border border-border rounded-[20px] overflow-hidden shadow-xl hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 group flex flex-col h-full p-[12px] duration-300">
         <div className="relative h-[110px] w-full bg-zinc-200 dark:bg-zinc-800 rounded-[14px] overflow-hidden shrink-0 flex items-center justify-center">
-          <Server className="w-12 h-12 text-[#6C3CE1]" />
+          <Server className="w-12 h-12 text-[#6C3CE1] group-hover:scale-[1.05] transition-transform duration-300" />
           <div className="absolute top-2 left-2">
             <span className="bg-gradient-to-r from-[#f43f5e] to-[#e11d48] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
               HOT
@@ -161,10 +161,10 @@ function PanelPricing() {
 
         <div className="pt-3 flex flex-col flex-1">
           <h3 className="font-bold text-foreground text-sm mb-0.5 group-hover:text-[#6C3CE1] dark:group-hover:text-purple-400 transition-colors line-clamp-1 leading-[1.2]">
-            Panel Pterodactyl
+            Panel Pterodactyl High Performance
           </h3>
           <p className="text-[11px] font-medium text-muted-foreground mb-3">
-            Sewa panel server Pterodactyl kualitas terbaik untuk kestabilan bot WA & game server Anda.
+            Sewa panel server Pterodactyl kualitas terbaik untuk kestabilan bot WA, game server, dan aplikasi Anda.
           </p>
 
           <div className="flex items-center gap-1 mb-3 mt-auto">
@@ -179,9 +179,9 @@ function PanelPricing() {
           <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-border">
             <div className="text-[#6C3CE1] dark:text-purple-400 font-bold text-xs sm:text-sm">Mulai Rp2.000</div>
             
-            {/* Langsung Mengarah ke Telegram */}
+            {/* Langsung Order via Telegram */}
             <a
-              href="https://t.me/username_tele_kamu" // <-- GANTI DENGAN USERNAME TELEGRAM ASLIMU
+              href="https://t.me/username_tele_kamu" // <-- GANTI USERNAME TELEGRAM KAMU DI SINI
               target="_blank"
               rel="noopener noreferrer"
               className="bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1 active:scale-95 transition-all cursor-pointer"
@@ -192,7 +192,7 @@ function PanelPricing() {
         </div>
       </div>
 
-      {/* Bagian Keunggulan List (Tetap Dipertahankan) */}
+      {/* Bagian Keunggulan / Fitur List */}
       <div className="md:col-span-2 bg-card/50 border border-border rounded-[20px] p-4 sm:p-5 shadow-xl duration-300 flex flex-col justify-center">
         <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 text-center md:text-left">
           Keunggulan Panel TanoPedia Style
@@ -215,7 +215,7 @@ export function ProductsSection() {
   const [activeCategory, setActiveCategory] = useState<Category>("semua");
 
   const getItemCount = () => {
-    if (activeCategory === "semua") return scripts.length + 1 + apps.length;
+    if (activeCategory === "semua") return scripts.length + 1 + apps.length; // 1 melambangkan single panel card
     if (activeCategory === "panel") return 1;
     if (activeCategory === "script") return scripts.length;
     if (activeCategory === "app") return apps.length;
@@ -296,7 +296,7 @@ export function ProductsSection() {
             )}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5">
               {apps.map((app) => (
-                <ScriptCard key={app.id} app={app} />
+                <ScriptCard key={app.id} script={app} />
               ))}
             </div>
           </div>
