@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star, Check, Crown, Zap, Code, Server, Smartphone } from "lucide-react";
+import { Star, Check, Code, Server, Smartphone, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
 type Category = "semua" | "panel" | "script" | "app";
@@ -59,20 +59,6 @@ const apps: Script[] = [
   }
 ];
 
-const pricingPlans = [
-  { ram: "1GB", price: 2000, label: null },
-  { ram: "2GB", price: 3000, label: null },
-  { ram: "3GB", price: 4000, label: "Starter", icon: Zap },
-  { ram: "4GB", price: 5000, label: null },
-  { ram: "5GB", price: 6500, label: "Popular", icon: Star, highlight: true },
-  { ram: "6GB", price: 7500, label: null },
-  { ram: "7GB", price: 8500, label: "Best Value", icon: Crown },
-  { ram: "8GB", price: 9500, label: null },
-  { ram: "9GB", price: 10500, label: null },
-  { ram: "10GB", price: 12000, label: null },
-  { ram: "Unlimited", price: 15000, label: "Ultimate", icon: Crown, isUnlimited: true },
-];
-
 const panelFeatures = [
   "CPU stabil",
   "VPS legal & stabil",
@@ -87,6 +73,7 @@ function formatPrice(price: number): string {
   return `Rp${price.toLocaleString("id-ID")}`;
 }
 
+// Komponen Card Universal untuk Script dan Aplikasi
 function ScriptCard({ script }: { script: Script }) {
   return (
     <div className="bg-card border border-border rounded-[20px] overflow-hidden shadow-xl hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 group flex flex-col h-full p-[12px] duration-300">
@@ -151,73 +138,66 @@ function ScriptCard({ script }: { script: Script }) {
   );
 }
 
+// 📦 PERUBAHAN UTAMA: Meringkas seluruh daftar RAM menjadi satu Card Panel Pterodactyl Besar ke Telegram
 function PanelPricing() {
   return (
-    <div>
-      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3 mb-4">
-        {pricingPlans.map((plan, index) => {
-          const Icon = plan.icon;
-          const planId = `panel-${plan.ram.toLowerCase()}`;
-          const checkoutUrl = `/checkout?type=panel&id=${planId}&name=${encodeURIComponent(`RAM ${plan.ram}`)}&price=${plan.price}`;
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      
+      {/* Card Utama Panel Pterodactyl */}
+      <div className="md:col-span-1 bg-card border border-border rounded-[20px] overflow-hidden shadow-xl hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 group flex flex-col h-full p-[12px] duration-300">
+        <div className="relative h-[110px] w-full bg-zinc-200 dark:bg-zinc-800 rounded-[14px] overflow-hidden shrink-0 flex items-center justify-center">
+          <Server className="w-12 h-12 text-[#6C3CE1] group-hover:scale-[1.05] transition-transform duration-300" />
+          <div className="absolute top-2 left-2">
+            <span className="bg-gradient-to-r from-[#f43f5e] to-[#e11d48] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+              HOT
+            </span>
+          </div>
+          <div className="absolute top-2 right-2">
+            <span className="bg-[#6C3CE1] text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full shadow-sm uppercase tracking-[0.5px]">
+              PANEL
+            </span>
+          </div>
+        </div>
 
-          return (
-            <Link
-              key={index}
-              href={checkoutUrl}
-              className={`relative bg-card text-foreground border rounded-[20px] p-3.5 text-center transition-all hover:-translate-y-1 hover:shadow-lg block duration-300 ${
-                plan.highlight
-                  ? "border-[#6C3CE1] ring-2 ring-[#6C3CE1]/20 shadow-[0_8px_25px_rgba(108,60,225,0.15)]"
-                  : plan.isUnlimited
-                    ? "border-amber-400 ring-2 ring-amber-400/20 col-span-2 xs:col-span-1"
-                    : "border-border hover:border-[#6C3CE1]/50 shadow-md"
-              }`}
+        <div className="pt-3 flex flex-col flex-1">
+          <h3 className="font-bold text-foreground text-sm mb-0.5 group-hover:text-[#6C3CE1] dark:group-hover:text-purple-400 transition-colors line-clamp-1 leading-[1.2]">
+            Panel Pterodactyl High Performance
+          </h3>
+          <p className="text-[11px] font-medium text-muted-foreground mb-3">
+            Sewa panel server Pterodactyl kualitas terbaik untuk kestabilan bot WA, game server, dan aplikasi Anda.
+          </p>
+
+          <div className="flex items-center gap-1 mb-3 mt-auto">
+            <div className="flex">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+              ))}
+            </div>
+            <span className="text-[10px] text-muted-foreground">5.0</span>
+          </div>
+
+          <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-border">
+            <div className="text-[#6C3CE1] dark:text-purple-400 font-bold text-xs sm:text-sm">Mulai Rp2.000</div>
+            
+            {/* Langsung Order via Telegram */}
+            <a
+              href="https://t.me/username_tele_kamu" // <-- GANTI USERNAME TELEGRAM KAMU DI SINI
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1 active:scale-95 transition-all cursor-pointer"
             >
-              {plan.label && (
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                  <span
-                    className={`inline-flex items-center gap-0.5 px-2.5 py-0.5 text-[9px] font-bold rounded-full whitespace-nowrap uppercase tracking-wide ${
-                      plan.isUnlimited
-                        ? "bg-amber-400 text-black"
-                        : plan.highlight
-                          ? "bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white"
-                          : "bg-muted text-muted-foreground border border-border"
-                    }`}
-                  >
-                    {Icon && <Icon className="w-2.5 h-2.5" />}
-                    {plan.label}
-                  </span>
-                </div>
-              )}
-              <Server className={`w-5 h-5 mx-auto mb-1.5 ${
-                plan.isUnlimited ? "text-amber-400" : plan.highlight ? "text-[#6C3CE1]" : "text-muted-foreground"
-              }`} />
-              <div className={`text-xl font-extrabold italic leading-none mb-1 ${
-                plan.isUnlimited ? "text-amber-400" : plan.highlight ? "text-[#6C3CE1]" : "text-foreground"
-              }`}>
-                {plan.ram}
-              </div>
-              <div className="text-xs text-[#6C3CE1] dark:text-purple-400 font-bold mb-3">
-                {formatPrice(plan.price)}
-              </div>
-              <span className={`block text-[11px] font-bold py-1.5 rounded-full transition-all active:scale-95 ${
-                plan.isUnlimited
-                  ? "bg-amber-400 text-black"
-                  : plan.highlight
-                    ? "bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white shadow-md shadow-[#6C3CE1]/20"
-                    : "bg-[#6c3ce1]/10 dark:bg-[#6c3ce1]/20 text-[#6C3CE1] dark:text-purple-300 hover:bg-[#6C3CE1] hover:text-white dark:hover:bg-[#6C3CE1]"
-              }`}>
-                Beli
-              </span>
-            </Link>
-          );
-        })}
+              <MessageSquare className="w-3 h-3" /> Order via Tele
+            </a>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-card/50 border border-border rounded-[20px] p-4 sm:p-5 shadow-xl duration-300">
-        <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 text-center">
+      {/* Bagian Keunggulan / Fitur List */}
+      <div className="md:col-span-2 bg-card/50 border border-border rounded-[20px] p-4 sm:p-5 shadow-xl duration-300 flex flex-col justify-center">
+        <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 text-center md:text-left">
           Keunggulan Panel TanoPedia Style
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {panelFeatures.map((feature, i) => (
             <div key={i} className="flex items-center gap-2 bg-card p-2.5 rounded-xl border border-border duration-300">
               <Check className="w-3.5 h-3.5 text-[#6C3CE1]" />
@@ -226,6 +206,7 @@ function PanelPricing() {
           ))}
         </div>
       </div>
+
     </div>
   );
 }
@@ -234,8 +215,8 @@ export function ProductsSection() {
   const [activeCategory, setActiveCategory] = useState<Category>("semua");
 
   const getItemCount = () => {
-    if (activeCategory === "semua") return scripts.length + pricingPlans.length + apps.length;
-    if (activeCategory === "panel") return pricingPlans.length;
+    if (activeCategory === "semua") return scripts.length + 1 + apps.length; // 1 melambangkan single panel card
+    if (activeCategory === "panel") return 1;
     if (activeCategory === "script") return scripts.length;
     if (activeCategory === "app") return apps.length;
     return 0;
