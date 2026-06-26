@@ -19,7 +19,7 @@ import {
 
 const MySwal = withReactContent(Swal);
 const WHATSAPP_NUMBER = "6285701961876";
-const TELEGRAM_URL = "https://t.me/username_tele_kamu"; // <-- GANTI USERNAME TELEGRAM ASLIMU DI SINI
+const TELEGRAM_URL = "https://t.me/tanoxds"; // <-- GANTI USERNAME TELEGRAM ASLIMU DI SINI
 const QRIS_IMAGE_URL = "/images/qristano.png"; 
 
 const toastKeren = (title: string, text: string, icon: 'warning' | 'error' | 'info') => {
