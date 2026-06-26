@@ -26,7 +26,7 @@ const categories = [
   { id: "app", label: "App" },
 ];
 
-// 📦 DATABASE UTAMA: Kita berikan kata "export" di depannya agar bisa di-import ke file checkout
+// DATABASE PUSAT
 export const ALL_PRODUCTS: Product[] = [
   {
     id: 201,
@@ -101,7 +101,7 @@ export function ProductsSection() {
         </div>
 
         {/* Info Total Item */}
-        <div className="mb-6">
+        <div className="mb-4">
           <h2 className="text-xs text-muted-foreground uppercase tracking-wider font-bold">
             {activeCategory === "semua" ? "Semua Layanan" : activeCategory === "panel" ? "Panel Hosting" : activeCategory === "script" ? "Source Code" : "Aplikasi Premium"}{" "}
             <span className="text-[#6C3CE1]">({filteredProducts.length})</span>
@@ -115,13 +115,19 @@ export function ProductsSection() {
               key={product.id}
               className="bg-card border border-border rounded-[20px] overflow-hidden shadow-md hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 p-[12px] duration-300 flex flex-col h-full group"
             >
-              <div className="relative h-[110px] w-full bg-zinc-200 dark:bg-zinc-800 rounded-[14px] overflow-hidden shrink-0 flex items-center justify-center">
+              {/* 🔳 UBAH WADAH FOTO DI SINI: Menggunakan aspect-square agar persegi sempurna */}
+              <div className="relative aspect-square w-full bg-zinc-200 dark:bg-zinc-800 rounded-[14px] overflow-hidden shrink-0 flex items-center justify-center p-3">
                 {product.image ? (
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                  <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="w-full h-full object-contain rounded-[10px] group-hover:scale-[1.03] transition-transform duration-300" 
+                  />
                 ) : (
-                  <Server className="w-10 h-10 text-[#6C3CE1]" />
+                  <Server className="w-12 h-12 text-[#6C3CE1]" />
                 )}
                 
+                {/* Badge Status */}
                 <div className="absolute top-2 left-2">
                   {product.isNew && (
                     <span className="bg-gradient-to-r from-[#f43f5e] to-[#e11d48] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">HOT</span>
@@ -134,6 +140,7 @@ export function ProductsSection() {
                 </div>
               </div>
 
+              {/* Teks Informasi & Tombol Navigasi */}
               <div className="pt-2.5 flex flex-col justify-between flex-1">
                 <div>
                   <h3 className="font-bold text-foreground text-sm group-hover:text-[#6C3CE1] dark:group-hover:text-purple-400 transition-colors line-clamp-1 leading-snug">
