@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ALL_PRODUCTS } from "@/components/products-section"; // <-- JALUR IMPORT DARI KATALOG DEPAN KAMU
+import { ALL_PRODUCTS } from "@/components/products-section"; // <-- Sesuaikan jalur import katalog depan kamu
 import Link from "next/link";
 import Swal from "sweetalert2"; 
 import withReactContent from "sweetalert2-react-content";
@@ -12,7 +12,6 @@ import {
   Minus, 
   CreditCard, 
   Check, 
-  UserCircle, 
   MessageSquare, 
   Download,
   Loader2 
@@ -51,13 +50,12 @@ function CheckoutContent() {
   const [showQrisModal, setShowQrisModal] = useState(false);
 
   const [quantity, setQuantity] = useState<number>(1);
-  const [whatsappNumber, setWhatsappNumber] = useState<string>("");
+  const [whatsappNumber, setWhatsappNumber] = useState<string>( "");
   const [customerName, setCustomerName] = useState<string>("");
-  const [panelUsername, setPanelUsername] = useState<string>(""); 
 
   // Mengambil ID dari parameter URL halaman depan
   const productId = parseInt(searchParams.get("id") || "0");
-  // Mencari data detail produk di dalam array ALL_PRODUCTS hasil import tadi
+  // Mencari data detail produk di dalam array ALL_PRODUCTS hasil import
   const product = ALL_PRODUCTS.find((p) => p.id === productId);
 
   if (!product) {
@@ -84,27 +82,21 @@ function CheckoutContent() {
   };
 
   const handleActionBayar = () => {
-    if (!customerName || !whatsappNumber) {
-      toastKeren("DATA KOSONG", "Mohon lengkapi Nama dan No. WhatsApp Anda!", "warning");
-      return;
-    }
-    if (isPanel && !panelUsername) {
-      toastKeren("USN PANEL", "Mohon isi Username untuk akun Panel Anda!", "info");
-      return;
-    }
-
     if (isPanel) {
+      // JIKA PANEL: Langsung redirect ke Telegram tanpa validasi form (karena form kosong)
       const message = `Halo Admin TanoPedia,%0A%0A` +
-                      `*ORDER PANEL VIA TELEGRAM*%0A` +
+                      `*TANYA / ORDER PANEL VIA TELEGRAM*%0A` +
                       `----------------------------%0A` +
-                      `- Pesanan: *Panel - ${product.name}*%0A` +
-                      `- Data Nama: ${customerName}%0A` +
-                      `- No. WA: ${whatsappNumber}%0A` +
-                      `- Request USN: *${panelUsername}*%0A` +
+                      `- Paket Produk: *${product.name}*%0A` +
                       `----------------------------%0A` +
-                      `Saya ingin memesan paket panel ini via Telegram.`;
+                      `Saya tertarik dengan layanan panel ini, mau tanya daftar harga paket lengkapnya dong min.`;
       window.open(`${TELEGRAM_URL}?text=${message}`, "_blank");
     } else {
+      // JIKA SCRIPT/APP: Cek kelengkapan form input pembeli terlebih dahulu
+      if (!customerName || !whatsappNumber) {
+        toastKeren("DATA KOSONG", "Mohon lengkapi Nama dan No. WhatsApp Anda!", "warning");
+        return;
+      }
       setShowQrisModal(true);
     }
   };
@@ -145,12 +137,15 @@ function CheckoutContent() {
             {product.description}
           </div>
           <div className="flex justify-between items-center text-xs pt-1.5 border-t border-border/40">
-            <span className="font-bold text-muted-foreground uppercase tracking-wide text-[10px]">Harga Satuan</span>
+            {/* JALUR DINAMIS TEKS HARGA: Jika panel, ubah tulisan jadi 'Mulai Dari' */}
+            <span className="font-bold text-muted-foreground uppercase tracking-wide text-[10px]">
+              {isPanel ? "Mulai Dari" : "Harga Satuan"}
+            </span>
             <span className="font-extrabold text-[#6C3CE1]">{formatPrice(product.price)}</span>
           </div>
         </div>
 
-        {/* Form Kuantitas / Metode Pembayaran khusus Non-Panel */}
+        {/* FORM DINAMIS: Hanya dirender jika produk BUKAN tipe panel */}
         {!isPanel ? (
           <>
             {/* Bagian Jumlah Beli */}
@@ -191,73 +186,61 @@ function CheckoutContent() {
                 </div>
               </div>
             </div>
+
+            {/* Form Identitas Pembeli */}
+            <div className="mb-4 space-y-3">
+              <div>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Nama Pembeli</label>
+                <input 
+                  type="text" 
+                  placeholder="Masukkan nama lengkap" 
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:border-[#6C3CE1] outline-none font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Nomor WhatsApp Aktif</label>
+                <div className="flex items-center border border-border rounded-xl bg-background overflow-hidden px-3 py-1">
+                  <span className="text-xs font-bold text-muted-foreground border-r border-border pr-3 mr-3">+62</span>
+                  <input 
+                    type="tel" 
+                    placeholder="812xxxxxxxx" 
+                    value={whatsappNumber}
+                    onChange={(e) => setWhatsappNumber(e.target.value)}
+                    className="w-full bg-transparent text-sm text-foreground focus:outline-none font-medium py-1.5"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Kotak Total Bayar (Hanya Script & App) */}
+            <div className="bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3.5 flex items-center justify-between mb-5">
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide text-[11px]">Total Bayar</span>
+              <span className="font-black text-emerald-600 dark:text-emerald-400 text-base sm:text-lg">
+                {formatPrice(totalPrice)}
+              </span>
+            </div>
           </>
         ) : (
-          <div className="mb-4 bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 text-xs text-muted-foreground leading-relaxed">
-            Untuk layanan <strong>Panel Hosting</strong>, transaksi diproses secara manual via Telegram demi keamanan dan kustomisasi spesifikasi server Anda.
+          /* JIKA PRODUK PANEL: Tampilkan Notice Rapi Sebagai Pengganti Form Kosong */
+          <div className="mb-5 bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-xs text-muted-foreground leading-relaxed shadow-sm">
+            💡 Untuk pemesanan layanan <strong>Panel Hosting</strong>, transaksi dan pemilihan spesifikasi paket dilakukan secara langsung via Telegram bersama Admin demi fleksibilitas konfigurasi server Anda.
           </div>
         )}
 
-        {/* Form Identitas Pembeli */}
-        <div className="mb-4 space-y-3">
-          <div>
-            <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Nama Pembeli</label>
-            <input 
-              type="text" 
-              placeholder="Masukkan nama lengkap" 
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:border-[#6C3CE1] outline-none font-medium"
-            />
-          </div>
-
-          <div>
-            <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Nomor WhatsApp Aktif</label>
-            <div className="flex items-center border border-border rounded-xl bg-background overflow-hidden px-3 py-1">
-              <span className="text-xs font-bold text-muted-foreground border-r border-border pr-3 mr-3">+62</span>
-              <input 
-                type="tel" 
-                placeholder="812xxxxxxxx" 
-                value={whatsappNumber}
-                onChange={(e) => setWhatsappNumber(e.target.value)}
-                className="w-full bg-transparent text-sm text-foreground focus:outline-none font-medium py-1.5"
-              />
-            </div>
-          </div>
-
-          {isPanel && (
-            <div>
-              <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1.5 flex items-center gap-1">
-                <UserCircle className="w-3.5 h-3.5" /> Request Username Panel
-              </label>
-              <input 
-                type="text" 
-                placeholder="Contoh: tano" 
-                value={panelUsername}
-                onChange={(e) => setPanelUsername(e.target.value)}
-                className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:border-[#6C3CE1] outline-none font-medium"
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Kotak Total Bayar */}
-        <div className="bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3.5 flex items-center justify-between mb-5">
-          <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide text-[11px]">Total Bayar</span>
-          <span className="font-black text-emerald-600 dark:text-emerald-400 text-base sm:text-lg">
-            {formatPrice(totalPrice)}
-          </span>
-        </div>
-
         {/* Tombol Aksi Bawah */}
         <div className="flex items-center gap-3 pt-3 border-t border-border mt-4">
+          {/* Tombol Batal */}
           <button 
             onClick={() => router.push("/#products")}
-            className="flex-1 bg-background border border-border text-muted-foreground hover:bg-muted/40 font-bold text-xs py-3 rounded-xl text-center uppercase tracking-wider transition-all cursor-pointer"
+            className="flex-1 bg-background border border-border text-muted-foreground hover:text-foreground hover:bg-muted/40 font-bold text-xs py-3 rounded-xl text-center uppercase tracking-wider transition-all cursor-pointer"
           >
             Batal
           </button>
 
+          {/* Tombol Order/Beli */}
           <button
             onClick={handleActionBayar}
             className={`flex-1 font-bold text-xs py-3 rounded-xl text-center flex items-center justify-center gap-1.5 transition-all uppercase tracking-wider shadow-md cursor-pointer text-white ${
@@ -278,7 +261,7 @@ function CheckoutContent() {
 
       </div>
 
-      {/* MODAL POP-UP QRIS */}
+      {/* MODAL POP-UP QRIS (Hanya Terbuka untuk Script/App setelah validasi tombol) */}
       {showQrisModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <div className="bg-card border border-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl p-6 text-center">
