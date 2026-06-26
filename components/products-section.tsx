@@ -53,7 +53,7 @@ export const ALL_PRODUCTS: Product[] = [
   },
   {
     id: 101,
-    name: "Alight Motion",
+    name: "ALIGHT MOTION PREMIUM",
     badge: "APP",
     badgeColor: "bg-[#6C3CE1]",
     price: 5000,
@@ -107,48 +107,55 @@ export function ProductsSection() {
           </h2>
         </div>
 
-        {/* Grid Katalog Utama - Mengikuti style premium rata tengah */}
+        {/* Grid Katalog Utama */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {filteredProducts.map((product) => (
             <div 
               key={product.id}
-              className="bg-card border border-border/70 rounded-[24px] p-3 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full text-center group"
+              className="bg-card border border-border/70 rounded-[24px] p-3 shadow-md hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 duration-300 flex flex-col h-full text-center group"
             >
-              {/* Wadah Foto: Putih bersih, padding pas, logo di tengah (Mirip Gambar Kanan) */}
-              <div className="relative aspect-square w-full bg-slate-50 dark:bg-zinc-900/40 rounded-[18px] overflow-hidden shrink-0 flex items-center justify-center p-5 mb-3">
+              {/* Wadah Persegi (Fotonya di-full-kan tanpa padding berlebih) */}
+              <div className="relative aspect-square w-full bg-zinc-200 dark:bg-zinc-800 rounded-[18px] overflow-hidden shrink-0 flex items-center justify-center mb-3">
                 {product.image ? (
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    className="w-2/3 h-2/3 object-contain rounded-2xl group-hover:scale-[1.05] transition-transform duration-300" 
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" 
                   />
                 ) : (
                   <Server className="w-10 h-10 text-[#6C3CE1] dark:text-purple-400" />
                 )}
                 
-                {/* Badge Status Tipis Transparan khas modern UI */}
+                {/* Badge HOT */}
+                <div className="absolute top-2 left-2">
+                  {product.isNew && (
+                    <span className="bg-gradient-to-r from-[#f43f5e] to-[#e11d48] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">HOT</span>
+                  )}
+                </div>
+
+                {/* Badge Kategori */}
                 <div className="absolute top-2 right-2">
-                  <span className="bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-300 text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
+                  <span className="bg-[#6C3CE1] text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full shadow-sm uppercase tracking-[0.5px]">
                     {product.badge}
                   </span>
                 </div>
               </div>
 
-              {/* Teks Informasi Rata Tengah (Center Aligned) */}
+              {/* Informasi Konten Rata Tengah */}
               <div className="flex flex-col justify-between flex-1 px-1">
-                <div className="mb-2">
-                  <h3 className="font-bold text-foreground text-[13px] leading-tight group-hover:text-[#6C3CE1] transition-colors line-clamp-1">
+                <div className="mb-2.5">
+                  <h3 className="font-bold text-foreground text-sm group-hover:text-[#6C3CE1] transition-colors line-clamp-1 leading-snug">
                     {product.name}
                   </h3>
-                  <div className="text-[#6C3CE1] dark:text-purple-400 font-black text-xs mt-1">
+                  <div className="text-[#6C3CE1] dark:text-purple-400 font-extrabold text-sm sm:text-base mt-1.5 border-t border-border/40 pt-1.5">
                     {formatDisplayPrice(product)}
                   </div>
                 </div>
 
-                {/* Tombol Beli Minimalis */}
+                {/* Tombol Ungu Gradasi Solid Kesukaanmu */}
                 <Link
                   href={`/checkout?id=${product.id}`}
-                  className="w-full bg-[#6C3CE1]/10 text-[#6C3CE1] hover:bg-[#6C3CE1] hover:text-white dark:bg-purple-500/10 dark:text-purple-300 dark:hover:bg-purple-600 dark:hover:text-white text-[11px] font-bold py-1.5 rounded-xl text-center active:scale-95 transition-all block uppercase tracking-wide cursor-pointer mt-1"
+                  className="w-full bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white text-[11px] font-bold py-2 rounded-xl text-center active:scale-95 transition-all block shadow-md shadow-[#6C3CE1]/15 uppercase tracking-wide cursor-pointer"
                 >
                   Beli
                 </Link>
