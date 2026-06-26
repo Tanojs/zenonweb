@@ -50,8 +50,8 @@ function CheckoutContent() {
   const [showQrisModal, setShowQrisModal] = useState(false);
 
   const [quantity, setQuantity] = useState<number>(1);
-  const [whatsappNumber, setWhatsappNumber] = useState<string>("");
-  const [customerName, setCustomerName] = useState<string>("");
+  const [whatsappNumber, setWhatsappNumber] = useState<string>( "");
+  const [customerName, setCustomerName] = useState<string>( "");
 
   // Mengambil ID dari parameter URL halaman depan
   const productId = parseInt(searchParams.get("id") || "0");
@@ -83,10 +83,8 @@ function CheckoutContent() {
 
   const handleActionBayar = () => {
     if (isPanel) {
-      // JIKA PANEL: Langsung buka link bot Telegram tanpa teks pesan tambahan
       window.open(TELEGRAM_BOT_URL, "_blank");
     } else {
-      // JIKA SCRIPT/APP: Cek kelengkapan form input pembeli terlebih dahulu
       if (!customerName || !whatsappNumber) {
         toastKeren("DATA KOSONG", "Mohon lengkapi Nama dan No. WhatsApp Anda!", "warning");
         return;
@@ -127,14 +125,14 @@ function CheckoutContent() {
         <div className="bg-muted/30 border border-border/60 rounded-2xl p-3.5 mb-4">
           <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block mb-1">ITEM DIPILIH</span>
           <h4 className="font-extrabold text-sm text-foreground leading-snug">{product.name}</h4>
-          <div className="border-l-2 border-[#6C3CE1] bg-[#6C3CE1]/5 p-2.5 my-2.5 rounded-r-xl text-[11px] text-muted-foreground leading-relaxed">
+          <div className="border-l-2 border-purple-500 bg-purple-500/5 p-2.5 my-2.5 rounded-r-xl text-[11px] text-muted-foreground leading-relaxed">
             {product.description}
           </div>
           <div className="flex justify-between items-center text-xs pt-1.5 border-t border-border/40">
             <span className="font-bold text-muted-foreground uppercase tracking-wide text-[10px]">
               {isPanel ? "Mulai Dari" : "Harga Satuan"}
             </span>
-            <span className="font-extrabold text-[#6C3CE1]">{formatPrice(product.price)}</span>
+            <span className="font-extrabold text-purple-500">{formatPrice(product.price)}</span>
           </div>
         </div>
 
@@ -164,17 +162,17 @@ function CheckoutContent() {
             {/* Bagian Metode Pembayaran */}
             <div className="mb-4">
               <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Metode Pembayaran</label>
-              <div className="border-2 border-[#6C3CE1] bg-[#6C3CE1]/5 rounded-xl p-3 flex items-center justify-between shadow-sm">
+              <div className="border-2 border-purple-500 bg-purple-500/5 rounded-xl p-3 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-background rounded-lg border border-[#6C3CE1]/30">
-                    <CreditCard className="w-4 h-4 text-[#6C3CE1]" />
+                  <div className="p-2 bg-background rounded-lg border border-purple-500/30">
+                    <CreditCard className="w-4 h-4 text-purple-500" />
                   </div>
                   <div>
                     <p className="text-xs font-extrabold text-foreground">QRIS (Otomatis)</p>
                     <p className="text-[10px] text-muted-foreground">Scan via DANA, GoPay, OVO, ShopeePay, dll.</p>
                   </div>
                 </div>
-                <div className="w-4 h-4 rounded-full bg-[#6C3CE1] flex items-center justify-center">
+                <div className="w-4 h-4 rounded-full bg-purple-500 flex items-center justify-center">
                   <Check className="w-2.5 h-2.5 text-white" />
                 </div>
               </div>
@@ -189,7 +187,7 @@ function CheckoutContent() {
                   placeholder="Masukkan nama lengkap" 
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:border-[#6C3CE1] outline-none font-medium"
+                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:border-purple-500 outline-none font-medium"
                 />
               </div>
 
@@ -217,7 +215,7 @@ function CheckoutContent() {
             </div>
           </>
         ) : (
-          /* JIKA PRODUK PANEL: Tampilkan Notice Rapi Pengganti Form */
+          /* JIKA PRODUK PANEL: Tampilkan Notice */
           <div className="mb-5 bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-xs text-muted-foreground leading-relaxed shadow-sm">
             💡 Untuk pemesanan layanan <strong>Panel Hosting</strong>, transaksi dan pemilihan spesifikasi paket dilakukan secara langsung melalui sistem otomatis kami di Bot Telegram.
           </div>
@@ -227,22 +225,22 @@ function CheckoutContent() {
         <div className="flex items-center gap-3 pt-3 border-t border-border mt-4">
           <button 
             onClick={() => router.push("/#products")}
-            className="flex-1 bg-background border border-border text-muted-foreground hover:text-foreground hover:bg-muted/40 font-bold text-xs py-3 rounded-xl text-center uppercase tracking-wider transition-all cursor-pointer"
+            className="flex-1 bg-background border border-border text-muted-foreground hover:text-foreground hover:bg-muted/40 font-bold text-xs py-3.5 rounded-xl text-center uppercase tracking-wider transition-all cursor-pointer"
           >
             Batal
           </button>
 
           <button
             onClick={handleActionBayar}
-            className={`flex-1 font-bold text-xs py-3 rounded-xl text-center flex items-center justify-center gap-1.5 transition-all uppercase tracking-wider shadow-md cursor-pointer text-white ${
+            className={`flex-1 font-bold text-xs py-3.5 rounded-xl text-center flex items-center justify-center gap-1.5 transition-all uppercase tracking-wider shadow-md cursor-pointer text-white whitespace-nowrap ${
               isPanel 
                 ? "bg-blue-500 hover:bg-blue-600 shadow-blue-500/10" 
-                : "bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] shadow-[#6C3CE1]/15"
+                : "bg-gradient-to-r from-purple-600 to-purple-500 shadow-purple-500/15"
             }`}
           >
             {isPanel ? (
               <>
-                <MessageSquare className="w-3.5 h-3.5" /> Order via Bot Telegram
+                <MessageSquare className="w-3.5 h-3.5" /> Order via Bot
               </>
             ) : (
               "Beli Sekarang →"
@@ -272,7 +270,7 @@ function CheckoutContent() {
 
             <button
               onClick={handleDownloadQris}
-              className="flex items-center gap-2 mx-auto mb-5 text-[#6C3CE1] dark:text-purple-300 hover:opacity-80 text-xs font-bold transition-all bg-[#6C3CE1]/10 px-4 py-2 rounded-full border border-[#6C3CE1]/20 cursor-pointer"
+              className="flex items-center gap-2 mx-auto mb-5 text-purple-500 dark:text-purple-300 hover:opacity-80 text-xs font-bold transition-all bg-purple-500/10 px-4 py-2 rounded-full border border-purple-500/20 cursor-pointer"
             >
               <Download className="w-4 h-4" />
               Simpan QRIS ke Galeri
@@ -280,7 +278,7 @@ function CheckoutContent() {
 
             <div className="bg-background border border-border p-3 rounded-lg mb-6">
               <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">Total Tagihan</p>
-              <p className="text-[#6C3CE1] dark:text-purple-400 text-2xl font-black italic">{formatPrice(totalPrice)}</p>
+              <p className="text-purple-500 dark:text-purple-400 text-2xl font-black italic">{formatPrice(totalPrice)}</p>
             </div>
 
             <button
@@ -300,7 +298,7 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-background flex items-center justify-center text-[#6C3CE1]">
+      <div className="min-h-screen bg-background flex items-center justify-center text-purple-500">
         <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     }>
