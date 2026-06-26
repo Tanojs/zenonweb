@@ -2,11 +2,11 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { ALL_PRODUCTS } from "@/components/products-section"; // <-- JALUR IMPORT DARI KATALOG DEPAN KAMU
 import Link from "next/link";
 import Swal from "sweetalert2"; 
 import withReactContent from "sweetalert2-react-content";
 import { 
-  ArrowLeft, 
   X, 
   Plus, 
   Minus, 
@@ -22,34 +22,6 @@ const MySwal = withReactContent(Swal);
 const WHATSAPP_NUMBER = "6285701961876";
 const TELEGRAM_URL = "https://t.me/username_tele_kamu"; // <-- GANTI USERNAME TELEGRAM ASLIMU DI SINI
 const QRIS_IMAGE_URL = "/images/qristano.png"; 
-
-// DATABASE PUSAT: Tempat menyimpan Deskripsi & Fitur agar tersinkronisasi
-const ALL_PRODUCTS = [
-  {
-    id: 201,
-    name: "Panel Pterodactyl",
-    badge: "PANEL",
-    price: 2000,
-    description: "Sewa panel server High Performance kualitas terbaik untuk bot WhatsApp pro dan game server Anda. Garansi penuh dan uptime maksimal.",
-    features: ["CPU & VPS stabil", "VPS legal", "Anti delay", "Uptime 24/7", "Anti suspend"]
-  },
-  {
-    id: 1,
-    name: "Script Zenon JPM",
-    badge: "SCRIPT",
-    price: 15000,
-    description: "PRO TEAM PLAN! Script JPM dengan fitur otomatisasi penyiaran pesan terlengkap, tanpa enkripsi, dan aman digunakan.",
-    features: ["SWGC", "Automation", "Push kontak", "All fitur work", "No enc"]
-  },
-  {
-    id: 101,
-    name: "ALIGHT MOTION PREMIUM",
-    badge: "APP",
-    price: 5000,
-    description: "Akun Alight Motion Pro berdurasi 1 tahun full premium tanpa watermark. Bisa pakai semua preset.",
-    features: ["Aktif 1 Tahun", "No Watermark", "Bisa pakai semua Preset", "Bergaransi"]
-  }
-];
 
 const toastKeren = (title: string, text: string, icon: 'warning' | 'error' | 'info') => {
   MySwal.fire({
@@ -83,22 +55,23 @@ function CheckoutContent() {
   const [customerName, setCustomerName] = useState<string>("");
   const [panelUsername, setPanelUsername] = useState<string>(""); 
 
-  // Ambil ID dari URL dan dapatkan data produk dari database pusat
+  // Mengambil ID dari parameter URL halaman depan
   const productId = parseInt(searchParams.get("id") || "0");
+  // Mencari data detail produk di dalam array ALL_PRODUCTS hasil import tadi
   const product = ALL_PRODUCTS.find((p) => p.id === productId);
 
   if (!product) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center text-foreground p-4 text-center">
-        <p className="font-bold text-sm mb-4">Waduh, Produk tidak ditemukan!</p>
-        <Link href="/#products" className="bg-[#6C3CE1] text-white px-4 py-2 rounded-xl text-xs font-bold uppercase">
+        <p className="font-bold text-sm mb-4">Waduh, Data Produk tidak ditemukan!</p>
+        <button onClick={() => router.push("/#products")} className="bg-[#6C3CE1] text-white px-4 py-2 rounded-xl text-xs font-bold uppercase cursor-pointer">
           Kembali ke Katalog
-        </Link>
+        </button>
       </div>
     );
   }
 
-  const isPanel = product.badge === "PANEL";
+  const isPanel = product.categoryType === "panel";
   const totalPrice = product.price * quantity;
 
   const handleDownloadQris = () => {
@@ -121,7 +94,6 @@ function CheckoutContent() {
     }
 
     if (isPanel) {
-      // JIKA PANEL: Langsung lempar chat ke Telegram membawa format data pesanan
       const message = `Halo Admin TanoPedia,%0A%0A` +
                       `*ORDER PANEL VIA TELEGRAM*%0A` +
                       `----------------------------%0A` +
@@ -133,7 +105,6 @@ function CheckoutContent() {
                       `Saya ingin memesan paket panel ini via Telegram.`;
       window.open(`${TELEGRAM_URL}?text=${message}`, "_blank");
     } else {
-      // JIKA SCRIPT/APP: Buka Modal Pop-up QRIS
       setShowQrisModal(true);
     }
   };
@@ -156,7 +127,7 @@ function CheckoutContent() {
 
   return (
     <div className="min-h-screen bg-background py-6 sm:py-8 px-3 sm:px-4 lg:px-6 text-foreground transition-colors duration-300 flex items-center justify-center">
-      <div className="bg-card w-full max-w-md rounded-[24px] border border-border p-5 relative shadow-2xl text-left">
+      <div className="bg-card border border-border w-full max-w-md rounded-[24px] p-5 relative shadow-2xl text-left">
         
         {/* Header Detail Pesanan */}
         <div className="flex items-center justify-between mb-4">
@@ -179,7 +150,7 @@ function CheckoutContent() {
           </div>
         </div>
 
-        {/* JIKA BUKAN PANEL: Munculkan form kuantitas dan simulasi QRIS box sesuai foto */}
+        {/* Form Kuantitas / Metode Pembayaran khusus Non-Panel */}
         {!isPanel ? (
           <>
             {/* Bagian Jumlah Beli */}
@@ -222,13 +193,12 @@ function CheckoutContent() {
             </div>
           </>
         ) : (
-          /* JIKA PRODUK PANEL: Tampilkan Notice Alternatif Server */
           <div className="mb-4 bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 text-xs text-muted-foreground leading-relaxed">
             Untuk layanan <strong>Panel Hosting</strong>, transaksi diproses secara manual via Telegram demi keamanan dan kustomisasi spesifikasi server Anda.
           </div>
         )}
 
-        {/* Form Data Identitas Pembeli */}
+        {/* Form Identitas Pembeli */}
         <div className="mb-4 space-y-3">
           <div>
             <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Nama Pembeli</label>
@@ -250,7 +220,7 @@ function CheckoutContent() {
                 placeholder="812xxxxxxxx" 
                 value={whatsappNumber}
                 onChange={(e) => setWhatsappNumber(e.target.value)}
-                className="w-full bg-transparent text-sm text-foreground focus:outline-none placeholder:text-muted-foreground/60 font-medium py-1.5"
+                className="w-full bg-transparent text-sm text-foreground focus:outline-none font-medium py-1.5"
               />
             </div>
           </div>
@@ -283,7 +253,7 @@ function CheckoutContent() {
         <div className="flex items-center gap-3 pt-3 border-t border-border mt-4">
           <button 
             onClick={() => router.push("/#products")}
-            className="flex-1 bg-background border border-border text-muted-foreground hover:text-foreground hover:bg-muted/40 font-bold text-xs py-3 rounded-xl text-center uppercase tracking-wider transition-all cursor-pointer"
+            className="flex-1 bg-background border border-border text-muted-foreground hover:bg-muted/40 font-bold text-xs py-3 rounded-xl text-center uppercase tracking-wider transition-all cursor-pointer"
           >
             Batal
           </button>
@@ -308,7 +278,7 @@ function CheckoutContent() {
 
       </div>
 
-      {/* JENDELA POP-UP MODAL QRIS */}
+      {/* MODAL POP-UP QRIS */}
       {showQrisModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <div className="bg-card border border-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl p-6 text-center">
