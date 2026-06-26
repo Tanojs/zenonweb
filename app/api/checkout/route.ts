@@ -5,20 +5,20 @@ export async function POST(request: Request) {
     const { productName, price, quantity, customerName, whatsappNumber } = await request.json();
 
     const apiKey = process.env.PAKASIR_API_KEY;
-    const projectSlug = process.env.PAKASIR_PROJECT; // Pastikan ini bernilai "tano-pedia"
+    const projectSlug = process.env.PAKASIR_PROJECT; 
     const orderId = `TANO-${Date.now()}`;
     const totalAmount = price * quantity;
 
-    // URL endpoint disesuaikan dengan format: /api/v1/project/{slug}/payment
-    const url = `https://app.pakasir.com/api/v1/project/${projectSlug}/payment`;
-
-    const response = await fetch(url, {
+    // KITA BALIK KE ENDPOINT STANDAR DOKUMENTASI (C.2)
+    // Tanpa menyisipkan slug di dalam URL
+    const response = await fetch("https://app.pakasir.com/api/v1/payments", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
+        project: projectSlug, // Slug dikirim di sini sesuai standar banyak API
         order_id: orderId,
         amount: totalAmount,
         customer_name: customerName,
@@ -30,20 +30,18 @@ export async function POST(request: Request) {
     const resData = await response.json();
 
     if (!response.ok) {
-      console.error("DEBUG - Pakasir Error Response:", resData);
+      console.error("DEBUG - Pakasir Error:", resData);
       return NextResponse.json({ 
         error: `Pakasir Error (${response.status}): ${JSON.stringify(resData)}` 
       }, { status: response.status });
     }
 
-    // Mengembalikan payment url invoice Pakasir
     return NextResponse.json({ 
       success: true, 
       paymentUrl: resData.payment_url || resData.url || resData.data?.payment_url 
     });
 
   } catch (error) {
-    console.error("Error Checkout API:", error);
-    return NextResponse.json({ error: "Terjadi kesalahan server internal" }, { status: 500 });
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }
