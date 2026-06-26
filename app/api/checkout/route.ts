@@ -6,18 +6,18 @@ export async function POST(request: Request) {
 
     const apiKey = process.env.PAKASIR_API_KEY;
     const projectSlug = process.env.PAKASIR_PROJECT;
-    const orderId = `TANO-${Date.now()}`; // Generate Order ID unik
+    const orderId = `TANO-${Date.now()}`;
     const totalAmount = price * quantity;
 
-    // 🚀 Sesuai dengan Gambar Dokumentasi C.2: API Transaction Create
+    // Perbaikan: Menambahkan Authorization Header sesuai dokumentasi C.2
     const response = await fetch("https://app.pakasir.com/api/v1/payments", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}` // Wajib ditambahkan
       },
       body: JSON.stringify({
         project: projectSlug,
-        api_key: apiKey,
         order_id: orderId,
         amount: totalAmount,
         customer_name: customerName,
@@ -28,13 +28,14 @@ export async function POST(request: Request) {
 
     const resData = await response.json();
 
+    // Log untuk debugging jika masih error
     if (!response.ok) {
+      console.log("Response Error dari Pakasir:", resData);
       return NextResponse.json({ 
-        error: resData.message || "Gagal terhubung ke server Pakasir" 
-      }, { status: 400 });
+        error: resData.message || "Gagal menghubungi server Pakasir" 
+      }, { status: response.status });
     }
 
-    // Mengembalikan payment url invoice Pakasir ke frontend
     return NextResponse.json({ 
       success: true, 
       paymentUrl: resData.payment_url || resData.url || resData.data?.payment_url 
