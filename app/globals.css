@@ -4,23 +4,24 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  --color-background: #0a0a0a;
+  /* Ubah ke Skema Ungu Gelap Tano Pedia */
+  --color-background: #0c0c1e;
   --color-foreground: #fafafa;
-  --color-muted: #18181b;
+  --color-muted: #1a1a2e;
   --color-muted-foreground: #d4d4d8;
-  --color-card: #18181b;
+  --color-card: #1a1a2e;
   --color-card-foreground: #fafafa;
-  --color-border: #3f3f46;
-  --color-primary: #2dd4bf;
-  --color-primary-foreground: #000000;
+  --color-border: rgba(108, 60, 225, 0.1);
+  --color-primary: #6C3CE1;
+  --color-primary-foreground: #ffffff;
   --color-secondary: #27272a;
   --color-secondary-foreground: #fafafa;
-  --color-accent: #2dd4bf;
-  --color-accent-foreground: #000000;
+  --color-accent: #a855f7;
+  --color-accent-foreground: #ffffff;
   --color-destructive: #ef4444;
-  --color-ring: #2dd4bf;
+  --color-ring: #6C3CE1;
 
-  --radius: 0.5rem;
+  --radius: 0.85rem;
 }
 
 * {
@@ -39,7 +40,7 @@ html.lenis, html.lenis body {
 }
 
 .lenis.lenis-smooth {
-  scroll-behavior: auto !important; /* WAJIB: Matikan smooth bawaan browser */
+  scroll-behavior: auto !important;
 }
 
 .lenis.lenis-smooth [data-lenis-prevent] {
@@ -54,13 +55,13 @@ html.lenis, html.lenis body {
   pointer-events: none;
 }
 
-/* SCROLLBAR CUSTOM */
+/* SCROLLBAR CUSTOM UNTUK TANO PEDIA */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #0c0c1e;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -69,16 +70,16 @@ html.lenis, html.lenis body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2dd4bf;
+  background: #6C3CE1;
 }
 
 /* Animations */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.5);
+    box-shadow: 0 0 0 0 rgba(108, 60, 225, 0.4);
   }
   50% {
-    box-shadow: 0 0 20px 5px rgba(45, 212, 191, 0.3);
+    box-shadow: 0 0 20px 5px rgba(108, 60, 225, 0.2);
   }
 }
 
@@ -95,20 +96,20 @@ html.lenis, html.lenis body {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Card hover */
+/* Card hover Tano Pedia Style */
 .card-hover {
   transition: all 0.2s ease;
 }
 
 .card-hover:hover {
   transform: translateY(-2px);
-  border-color: rgba(45, 212, 191, 0.5);
-  box-shadow: 0 8px 30px -10px rgba(45, 212, 191, 0.3);
+  border-color: rgba(108, 60, 225, 0.3);
+  box-shadow: 0 8px 30px -10px rgba(108, 60, 225, 0.25);
 }
 
-/* Gradient text */
+/* Gradient text Ungu Gradasi */
 .gradient-text {
-  background: linear-gradient(135deg, #2dd4bf 0%, #22d3ee 100%);
+  background: linear-gradient(135deg, #6C3CE1 0%, #a855f7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
