@@ -2,33 +2,30 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link"; // atau "next/link" tergantung next versi kamu
+import Link from "next/link";
 import Swal from "sweetalert2"; 
 import withReactContent from "sweetalert2-react-content";
 import { 
   ArrowLeft, 
-  QrCode,
-  CheckCircle2,
-  Loader2,
-  Shield,
-  Zap,
-  UserCircle,
   X,
-  Download
+  Download,
+  UserCircle,
+  MessageSquare,
+  Loader2
 } from "lucide-react";
 
 const MySwal = withReactContent(Swal);
 const WHATSAPP_NUMBER = "6285701961876";
+const TELEGRAM_URL = "https://t.me/username_tele_kamu"; // <-- GANTI USERNAME TELEGRAM ASLIMU DI SINI
 const QRIS_IMAGE_URL = "/images/qristano.png"; 
 
-// FUNGSI NOTIFIKASI STYLE PREMIUM TANOPEDIA (ANTI KEMBANG KEMPIS)
 const toastKeren = (title: string, text: string, icon: 'warning' | 'error' | 'info') => {
   MySwal.fire({
     title: <span className="text-white font-black italic uppercase tracking-tighter text-xl">{title}</span>,
     html: <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">{text}</span>,
     icon: icon,
-    iconColor: '#6C3CE1', // Ganti ke ungu premium
-    background: '#0c0c1e', // Latar belakang ungu malam
+    iconColor: '#6C3CE1',
+    background: '#0c0c1e',
     confirmButtonText: 'OKE SIAP',
     confirmButtonColor: '#6C3CE1',
     scrollbarPadding: false,
@@ -59,6 +56,9 @@ function CheckoutContent() {
   const productType = searchParams.get("type") || "panel";
   const productName = searchParams.get("name") || "";
   const productPrice = parseInt(searchParams.get("price") || "0");
+  const quantity = parseInt(searchParams.get("qty") || "1"); // Mengambil jumlah beli
+
+  const totalPrice = productPrice * quantity; // Total harga kumulatif
 
   const handleDownloadQris = () => {
     const link = document.createElement("a");
@@ -69,7 +69,7 @@ function CheckoutContent() {
     document.body.removeChild(link);
   };
 
-  const handleShowQris = () => {
+  const handleActionBayar = () => {
     if (!customerName || !customerPhone) {
       toastKeren("DATA KOSONG", "Mohon lengkapi Nama dan No. WhatsApp!", "warning");
       return;
@@ -78,24 +78,37 @@ function CheckoutContent() {
       toastKeren("USN PANEL", "Mohon isi Username untuk akun Panel Anda!", "info");
       return;
     }
-    setShowQrisModal(true);
+
+    if (productType === "panel") {
+      // JIKA PANEL: Langsung lempar ke Telegram membawa data teks formatan
+      const message = `Halo Admin TanoPedia,%0A%0A` +
+                      `*ORDER PANEL VIA TELEGRAM*%0A` +
+                      `----------------------------%0A` +
+                      `- Pesanan: *Panel - ${productName}*%0A` +
+                      `- Data Nama: ${customerName}%0A` +
+                      `- No. WA: ${customerPhone}%0A` +
+                      `- Request USN: *${panelUsername}*%0A` +
+                      `----------------------------%0A` +
+                      `Saya ingin memesan paket panel ini via Telegram.`;
+      window.open(`${TELEGRAM_URL}?text=${message}`, "_blank");
+    } else {
+      // JIKA SCRIPT/APP: Buka Modal QRIS bawaan asli kamu
+      setShowQrisModal(true);
+    }
   };
 
   const handleConfirmWhatsApp = () => {
-    let categoryLabel = "Produk";
-    if (productType === "panel") categoryLabel = "Panel";
-    else if (productType === "script") categoryLabel = "Script";
-    else if (productType === "app") categoryLabel = "Aplikasi";
+    let categoryLabel = productType === "script" ? "Script" : "Aplikasi";
 
     const message = `Halo Admin TanoPedia,%0A%0A` +
-                    `*KONFIRMASI PEMBAYARAN QRIS*%0A` +
+                    `*` + `KONFIRMASI PEMBAYARAN QRIS*%0A` +
                     `----------------------------%0A` +
                     `- Pesanan: *${categoryLabel} - ${productName}*%0A` +
-                    `- Total: *${formatPrice(productPrice)}*%0A%0A` +
+                    `- Jumlah Beli: *${quantity}x*%0A` +
+                    `- Total Bayar: *${formatPrice(totalPrice)}*%0A%0A` +
                     `*Data Pembeli:*%0A` +
                     `- Nama: ${customerName}%0A` +
                     `- No. WA: ${customerPhone}%0A` +
-                    (productType === "panel" ? `- USN Panel: *${panelUsername}*%0A` : "") +
                     `----------------------------%0A` +
                     `Saya sudah scan QRIS, berikut saya lampirkan bukti transfernya.`;
 
@@ -111,36 +124,38 @@ function CheckoutContent() {
 
         <div className="text-center mb-6">
           <h1 className="text-2xl font-black uppercase italic tracking-tight text-foreground">Checkout</h1>
-          <p className="text-muted-foreground text-xs sm:text-sm font-medium">Scan QRIS dan Konfirmasi</p>
+          <p className="text-muted-foreground text-xs sm:text-sm font-medium">Lengkapi Data Pemesanan Anda</p>
         </div>
 
         {/* Ringkasan Pembayaran */}
-        <div className="bg-card border border-border rounded-xl p-5 mb-6 transition-colors duration-300 shadow-sm">
+        <div className="bg-card border border-border rounded-xl p-5 mb-6 shadow-sm">
           <div className="flex justify-between items-center">
             <div>
               <p className="text-foreground font-bold">{productType === "panel" ? `Panel ${productName}` : productName}</p>
-              <p className="text-muted-foreground text-xs mt-1 italic font-medium">Total yang harus dibayar:</p>
+              <p className="text-muted-foreground text-[11px] mt-1 italic font-medium">
+                {quantity}x barang ({formatPrice(productPrice)} / item)
+              </p>
             </div>
-            <p className="text-[#6C3CE1] dark:text-purple-400 font-extrabold text-xl">{formatPrice(productPrice)}</p>
+            <p className="text-[#6C3CE1] dark:text-purple-400 font-extrabold text-xl">{formatPrice(totalPrice)}</p>
           </div>
         </div>
 
         {/* Form Data Pembeli */}
-        <div className="bg-card border border-border rounded-xl p-5 mb-6 space-y-4 transition-colors duration-300 shadow-sm">
+        <div className="bg-card border border-border rounded-xl p-5 mb-6 space-y-4 shadow-sm">
           <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Data Pembeli</h2>
           <input
             type="text"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
             placeholder="Nama Lengkap"
-            className="w-full bg-background border border-border rounded-lg px-4 py-3 text-sm focus:border-[#6C3CE1] outline-none transition-colors text-foreground"
+            className="w-full bg-background border border-border rounded-lg px-4 py-3 text-sm focus:border-[#6C3CE1] outline-none text-foreground"
           />
           <input
             type="tel"
             value={customerPhone}
             onChange={(e) => setCustomerPhone(e.target.value)}
             placeholder="No. WhatsApp (Aktif)"
-            className="w-full bg-background border border-border rounded-lg px-4 py-3 text-sm focus:border-[#6C3CE1] outline-none transition-colors text-foreground"
+            className="w-full bg-background border border-border rounded-lg px-4 py-3 text-sm focus:border-[#6C3CE1] outline-none text-foreground"
           />
           {productType === "panel" && (
             <div className="p-3 bg-[#6C3CE1]/5 border border-[#6C3CE1]/20 rounded-lg">
@@ -158,21 +173,31 @@ function CheckoutContent() {
           )}
         </div>
 
-        {/* Tombol Utama */}
+        {/* Tombol Utama Dinamis */}
         <button
-          onClick={handleShowQris}
-          className="w-full py-4 rounded-xl font-bold bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white shadow-lg shadow-[#6C3CE1]/25 active:scale-95 transition-all cursor-pointer uppercase tracking-wider text-sm"
+          onClick={handleActionBayar}
+          className={`w-full py-4 rounded-xl font-bold text-white shadow-lg active:scale-95 transition-all cursor-pointer uppercase tracking-wider text-sm flex items-center justify-center gap-2 ${
+            productType === "panel" 
+              ? "bg-blue-500 shadow-blue-500/20 hover:bg-blue-600" 
+              : "bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] shadow-[#6C3CE1]/25"
+          }`}
         >
-          Bayar Sekarang
+          {productType === "panel" ? (
+            <>
+              <MessageSquare className="w-4 h-4" /> Order via Telegram
+            </>
+          ) : (
+            "Bayar Sekarang"
+          )}
         </button>
 
         {/* Modal QRIS */}
         {showQrisModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className="bg-card border border-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl transition-colors duration-300">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div className="bg-card border border-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl">
               <button 
                 onClick={() => setShowQrisModal(false)}
-                className="absolute top-3 right-3 p-2 bg-foreground/5 hover:bg-foreground/10 rounded-full text-foreground transition-colors cursor-pointer"
+                className="absolute top-3 right-3 p-2 bg-foreground/5 hover:bg-foreground/10 rounded-full text-foreground cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -193,9 +218,9 @@ function CheckoutContent() {
                   Simpan QRIS ke Galeri
                 </button>
 
-                <div className="bg-background border border-border p-3 rounded-lg mb-6 transition-colors duration-300">
+                <div className="bg-background border border-border p-3 rounded-lg mb-6">
                   <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">Total Tagihan</p>
-                  <p className="text-[#6C3CE1] dark:text-purple-400 text-2xl font-black italic">{formatPrice(productPrice)}</p>
+                  <p className="text-[#6C3CE1] dark:text-purple-400 text-2xl font-black italic">{formatPrice(totalPrice)}</p>
                 </div>
 
                 <button
