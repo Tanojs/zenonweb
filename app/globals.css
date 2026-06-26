@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* WAJIB UNTUK TAILWIND v4: Memberitahu Tailwind untuk aktif saat kelas .dark ada di html */
+@variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --font-sans: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
