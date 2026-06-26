@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/navigation"; // atau "next/link" tergantung next versi kamu
+import Link from "next/link"; // atau "next/link" tergantung next versi kamu
 import Swal from "sweetalert2"; 
 import withReactContent from "sweetalert2-react-content";
 import { 
