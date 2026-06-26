@@ -38,7 +38,7 @@ const panelData: Script[] = [
     price: 2000,
     rating: 5.0,
     reviews: 42,
-    image: "", // Kosongkan atau isi path gambar panel jika ada
+    image: "/images/zenon-sc.jpg", // Kosongkan atau isi path gambar panel jika ada
     description: "Sewa panel server High Performance",
     isNew: true,
     features: ["CPU & VPS stabil", "VPS legal", "Anti delay", "Uptime 24/7", "Anti suspend"],
