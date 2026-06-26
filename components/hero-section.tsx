@@ -5,27 +5,28 @@ import useEmblaCarousel from "embla-carousel-react";
 import { ChevronRight, Zap, Shield, Users } from "lucide-react";
 import Link from "next/link";
 
+// 📦 PERUBAHAN UTAMA: Target diubah semua ke #products agar tombol berfungsi kembali
 const SLIDES = [
   {
     category: "PANEL PTERODACTYL",
     title: <>HOSTING <span className="bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] bg-clip-text text-transparent pr-2">PREMIUM</span></>,
     desc: "Panel Pterodactyl dengan VPS legal premium, server stabil, performa cepat, uptime aman, dan online 24/7 nonstop.",
     bg: "/images/zenon-sc.jpg",
-    target: "#panel"
+    target: "#products" 
   },
   {
     category: "SOURCE CODE",
     title: <>SC <span className="bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] bg-clip-text text-transparent pr-3 pl-0.5">BOT</span></>,
-    desc: "Source code premium dengan fitur lengkap, ringan, aman, dan mudah digunakan.",
+    desc: "Source code premium dengan fitur lengkap, ringan, aman, and mudah digunakan.",
     bg: "/images/zenon-sc.jpg",
-    target: "#script"
+    target: "#products"
   },
   {
     category: "APP",
     title: <>APP <span className="bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] bg-clip-text text-transparent pr-2">PREMIUM</span></>,
     desc: "Aplikasi premium murah.",
     bg: "/images/zenon-sc.jpg",
-    target: "#app"
+    target: "#products"
   }
 ];
 
