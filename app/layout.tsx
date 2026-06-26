@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll"; 
-import { ThemeProvider } from "@/components/theme-provider"; // <-- Import ThemeProvider milikmu
+import { ThemeProvider } from "@/components/theme-provider"; 
+import { BottomNav } from "@/components/BottomNav"; // <-- Import BottomNav yang baru dibuat
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0c0c1e", // Sesuaikan dengan warna dasar Tano Pedia
+  themeColor: "#0c0c1e", 
   width: "device-width",
   initialScale: 1,
 };
@@ -34,19 +35,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // Catatan: Tulisan bg-[#0d0d0d] di sini dihapus agar tidak mengunci warna hitam pekat kaku
     <html lang="id" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
-        {/* WAJIB: Membungkus aplikasi dengan ThemeProvider agar tombol tema di navbar berfungsi */}
+      {/* pb-16 memastikan konten terbawah aman di HP, sm:pb-0 mengembalikannya ke normal di laptop */}
+      <body className={`${inter.variable} font-sans antialiased pb-16 sm:pb-0`}>
         <ThemeProvider 
           attribute="class" 
           defaultTheme="dark" 
           enableSystem={false}
         >
-          {/* Bungkus children di sini biar semua halaman jadi smooth */}
           <SmoothScroll>
             {children}
           </SmoothScroll>
+          
+          {/* Navigasi Bawah nangkring di sini agar aktif secara global */}
+          <BottomNav />
         </ThemeProvider>
       </body>
     </html>
