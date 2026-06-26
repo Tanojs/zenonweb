@@ -18,6 +18,7 @@ interface Script {
   image?: string; 
   isNew?: boolean;
   features: string[];
+  isCustomTelegram?: boolean; // Menandakan kalau diklik langsung ke Telegram
 }
 
 const categories = [
@@ -25,6 +26,24 @@ const categories = [
   { id: "panel", label: "Panel" },
   { id: "script", label: "Script" },
   { id: "app", label: "App" },
+];
+
+// 📦 DATA PANEL DIJADIKAN SATU DI SINI, FORMAT SAMA DENGAN SC & APP PREMIUM
+const panelData: Script[] = [
+  {
+    id: 201,
+    name: "Panel Pterodactyl",
+    badge: "PANEL",
+    badgeColor: "bg-[#6C3CE1]",
+    price: 2000,
+    rating: 5.0,
+    reviews: 42,
+    image: "", // Kosongkan atau isi path gambar panel jika ada
+    description: "Sewa panel server High Performance",
+    isNew: true,
+    features: ["CPU & VPS stabil", "VPS legal", "Anti delay", "Uptime 24/7", "Anti suspend"],
+    isCustomTelegram: true // Mengaktifkan tombol via Telegram
+  }
 ];
 
 const scripts: Script[] = [
@@ -59,30 +78,26 @@ const apps: Script[] = [
   }
 ];
 
-const panelFeatures = [
-  "CPU stabil",
-  "VPS legal & stabil",
-  "Server fast & anti delay",
-  "Uptime 24/7",
-  "Anti suspend",
-  "Garansi aktif 20hari",
-  "Technical Support 24/7",
-];
-
 function formatPrice(price: number): string {
+  if (price === 2000) return "Mulai Rp2.000"; // Menangani teks khusus harga awal panel kamu
   return `Rp${price.toLocaleString("id-ID")}`;
 }
 
-// Komponen Card Universal untuk Script dan Aplikasi
+// 📱 KOMPONEN CARD UNIVERSAL (Bentuk Asli Kamu, Dipakai Untuk Semua Layanan)
 function ScriptCard({ script }: { script: Script }) {
   return (
     <div className="bg-card border border-border rounded-[20px] overflow-hidden shadow-xl hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 group flex flex-col h-full p-[12px] duration-300">
-      <div className="relative h-[110px] w-full bg-zinc-200 dark:bg-zinc-800 rounded-[14px] overflow-hidden shrink-0">
-        <img 
-          src={script.image || "/placeholder-script.jpg"} 
-          alt={script.name}
-          className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
-        />
+      <div className="relative h-[110px] w-full bg-zinc-200 dark:bg-zinc-800 rounded-[14px] overflow-hidden shrink-0 flex items-center justify-center">
+        {script.image ? (
+          <img 
+            src={script.image} 
+            alt={script.name}
+            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+          />
+        ) : (
+          /* Tampilan default ikon Server jika data panel tidak punya image */
+          <Server className="w-10 h-10 text-[#6C3CE1]" />
+        )}
         <div className="absolute top-2 left-2 flex gap-1">
           {script.isNew && (
             <span className="bg-gradient-to-r from-[#f43f5e] to-[#e11d48] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
@@ -103,7 +118,7 @@ function ScriptCard({ script }: { script: Script }) {
         </h3>
         <p className="text-[11px] font-medium text-muted-foreground mb-3 line-clamp-2">{script.description}</p>
 
-        {/* Fitur */}
+        {/* Fitur List */}
         <div className="flex-1 space-y-1 mb-4">
           {script.features?.map((feat, i) => (
             <div key={i} className="flex items-center gap-1.5">
@@ -126,87 +141,29 @@ function ScriptCard({ script }: { script: Script }) {
 
         <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-border">
           <div className="text-[#6C3CE1] dark:text-purple-400 font-bold text-sm sm:text-base">{formatPrice(script.price)}</div>
-          <Link
-            href={`/checkout?type=${script.badge.toLowerCase()}&id=${script.id}&name=${encodeURIComponent(script.name)}&price=${script.price}`}
-            className="bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white text-[11px] font-bold px-4 py-1.5 rounded-full shadow-md shadow-[#6C3CE1]/15 active:scale-95 transition-all cursor-pointer"
-          >
-            Beli
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 📦 PERUBAHAN UTAMA: Meringkas seluruh daftar RAM menjadi satu Card Panel Pterodactyl Besar ke Telegram
-function PanelPricing() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-      
-      {/* Card Utama Panel Pterodactyl */}
-      <div className="md:col-span-1 bg-card border border-border rounded-[20px] overflow-hidden shadow-xl hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 group flex flex-col h-full p-[12px] duration-300">
-        <div className="relative h-[110px] w-full bg-zinc-200 dark:bg-zinc-800 rounded-[14px] overflow-hidden shrink-0 flex items-center justify-center">
-          <Server className="w-12 h-12 text-[#6C3CE1] group-hover:scale-[1.05] transition-transform duration-300" />
-          <div className="absolute top-2 left-2">
-            <span className="bg-gradient-to-r from-[#f43f5e] to-[#e11d48] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-              HOT
-            </span>
-          </div>
-          <div className="absolute top-2 right-2">
-            <span className="bg-[#6C3CE1] text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full shadow-sm uppercase tracking-[0.5px]">
-              PANEL
-            </span>
-          </div>
-        </div>
-
-        <div className="pt-3 flex flex-col flex-1">
-          <h3 className="font-bold text-foreground text-sm mb-0.5 group-hover:text-[#6C3CE1] dark:group-hover:text-purple-400 transition-colors line-clamp-1 leading-[1.2]">
-            Panel Pterodactyl High Performance
-          </h3>
-          <p className="text-[11px] font-medium text-muted-foreground mb-3">
-            Sewa panel server Pterodactyl kualitas terbaik untuk kestabilan bot WA, game server, dan aplikasi Anda.
-          </p>
-
-          <div className="flex items-center gap-1 mb-3 mt-auto">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-              ))}
-            </div>
-            <span className="text-[10px] text-muted-foreground">5.0</span>
-          </div>
-
-          <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-border">
-            <div className="text-[#6C3CE1] dark:text-purple-400 font-bold text-xs sm:text-sm">Mulai Rp2.000</div>
-            
-            {/* Langsung Order via Telegram */}
+          
+          {/* PEMBEDA CARA BELI OTOMATIS DISINI */}
+          {script.isCustomTelegram ? (
+            /* Khusus Panel: Tombol Order via Tele */
             <a
               href="https://t.me/username_tele_kamu" // <-- GANTI USERNAME TELEGRAM KAMU DI SINI
               target="_blank"
               rel="noopener noreferrer"
               className="bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1 active:scale-95 transition-all cursor-pointer"
             >
-              <MessageSquare className="w-3 h-3" /> Order via Tele
+              <MessageSquare className="w-3 h-3" /> Tele
             </a>
-          </div>
+          ) : (
+            /* Produk Lainnya (Script & App): Menggunakan tautan Checkout Aplikasi */
+            <Link
+              href={`/checkout?type=${script.badge.toLowerCase()}&id=${script.id}&name=${encodeURIComponent(script.name)}&price=${script.price}`}
+              className="bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white text-[11px] font-bold px-4 py-1.5 rounded-full shadow-md shadow-[#6C3CE1]/15 active:scale-95 transition-all cursor-pointer"
+            >
+              Beli
+            </Link>
+          )}
         </div>
       </div>
-
-      {/* Bagian Keunggulan / Fitur List */}
-      <div className="md:col-span-2 bg-card/50 border border-border rounded-[20px] p-4 sm:p-5 shadow-xl duration-300 flex flex-col justify-center">
-        <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 text-center md:text-left">
-          Keunggulan Panel TanoPedia Style
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {panelFeatures.map((feature, i) => (
-            <div key={i} className="flex items-center gap-2 bg-card p-2.5 rounded-xl border border-border duration-300">
-              <Check className="w-3.5 h-3.5 text-[#6C3CE1]" />
-              <span className="text-xs text-foreground/90 font-medium">{feature}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
     </div>
   );
 }
@@ -215,8 +172,8 @@ export function ProductsSection() {
   const [activeCategory, setActiveCategory] = useState<Category>("semua");
 
   const getItemCount = () => {
-    if (activeCategory === "semua") return scripts.length + 1 + apps.length; // 1 melambangkan single panel card
-    if (activeCategory === "panel") return 1;
+    if (activeCategory === "semua") return panelData.length + scripts.length + apps.length;
+    if (activeCategory === "panel") return panelData.length;
     if (activeCategory === "script") return scripts.length;
     if (activeCategory === "app") return apps.length;
     return 0;
@@ -255,7 +212,7 @@ export function ProductsSection() {
           </h2>
         </div>
 
-        {/* --- ID PANEL --- */}
+        {/* --- SECTION PANEL --- */}
         {(activeCategory === "semua" || activeCategory === "panel") && (
           <div id="panel" className="mb-8 scroll-mt-24">
             {activeCategory === "semua" && (
@@ -264,11 +221,15 @@ export function ProductsSection() {
                 Panel Hosting
               </h3>
             )}
-            <PanelPricing />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5">
+              {panelData.map((panel) => (
+                <ScriptCard key={panel.id} script={panel} />
+              ))}
+            </div>
           </div>
         )}
 
-        {/* --- ID SCRIPT --- */}
+        {/* --- SECTION SCRIPT --- */}
         {(activeCategory === "semua" || activeCategory === "script") && (
           <div id="script" className="mb-8 scroll-mt-24">
             {activeCategory === "semua" && (
@@ -285,7 +246,7 @@ export function ProductsSection() {
           </div>
         )}
 
-        {/* --- ID APP --- */}
+        {/* --- SECTION APP --- */}
         {(activeCategory === "semua" || activeCategory === "app") && (
           <div id="app" className="scroll-mt-24">
             {activeCategory === "semua" && (
