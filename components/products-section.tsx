@@ -194,10 +194,11 @@ export function ProductsSection() {
         )}
       </div>
 
-      {/* 📥 JENDELA DETAIL MODAL POP-UP (MUNCUL SAAT CARD DIPENCET) */}
+      {/* 📥 JENDELA DETAIL MODAL POP-UP */}
       {selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-fadeIn">
-          <div className="bg-card w-full sm:max-w-md rounded-t-[28px] sm:rounded-[24px] border border-border p-5 pb-6 max-h-[85vh] overflow-y-auto shadow-2xl relative transform transition-transform duration-300 animate-slideUp">
+          {/* pb-24 ditambahkan agar konten terbawah modal naik dan tidak terhalang Navigasi Menu Utama HP */}
+          <div className="bg-card w-full sm:max-w-md rounded-t-[28px] sm:rounded-[24px] border border-border p-5 pb-24 sm:pb-6 max-h-[85vh] overflow-y-auto shadow-2xl relative transform transition-transform duration-300 animate-slideUp">
             
             {/* Tombol Close Silang */}
             <button 
@@ -245,7 +246,7 @@ export function ProductsSection() {
 
               {selectedProduct.isCustomTelegram ? (
                 <a
-                  href="https://t.me/username_tele_kamu" // <-- GANTI USERNAME TELEGRAM ASLIMU DI SINI
+                  href="https://t.me/username_tele_kamu" // <-- GANTI USERNAME TELEGRAM KAMU DI SINI
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer uppercase tracking-wide"
