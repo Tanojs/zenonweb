@@ -19,7 +19,7 @@ import {
 
 const MySwal = withReactContent(Swal);
 const WHATSAPP_NUMBER = "6285701961876";
-const TELEGRAM_URL = "https://t.me/tanoxds"; // <-- GANTI USERNAME TELEGRAM ASLIMU DI SINI
+const TELEGRAM_BOT_URL = "https://t.me/username_bot_kamu"; // <-- GANTI DENGAN LINK BOT TELEGRAM KAMU DI SINI
 const QRIS_IMAGE_URL = "/images/qristano.png"; 
 
 const toastKeren = (title: string, text: string, icon: 'warning' | 'error' | 'info') => {
@@ -50,7 +50,7 @@ function CheckoutContent() {
   const [showQrisModal, setShowQrisModal] = useState(false);
 
   const [quantity, setQuantity] = useState<number>(1);
-  const [whatsappNumber, setWhatsappNumber] = useState<string>( "");
+  const [whatsappNumber, setWhatsappNumber] = useState<string>("");
   const [customerName, setCustomerName] = useState<string>("");
 
   // Mengambil ID dari parameter URL halaman depan
@@ -83,14 +83,8 @@ function CheckoutContent() {
 
   const handleActionBayar = () => {
     if (isPanel) {
-      // JIKA PANEL: Langsung redirect ke Telegram tanpa validasi form (karena form kosong)
-      const message = `Halo Admin TanoPedia,%0A%0A` +
-                      `*TANYA / ORDER PANEL VIA TELEGRAM*%0A` +
-                      `----------------------------%0A` +
-                      `- Paket Produk: *${product.name}*%0A` +
-                      `----------------------------%0A` +
-                      `Saya tertarik dengan layanan panel ini, mau tanya daftar harga paket lengkapnya dong min.`;
-      window.open(`${TELEGRAM_URL}?text=${message}`, "_blank");
+      // JIKA PANEL: Langsung buka link bot Telegram tanpa teks pesan tambahan
+      window.open(TELEGRAM_BOT_URL, "_blank");
     } else {
       // JIKA SCRIPT/APP: Cek kelengkapan form input pembeli terlebih dahulu
       if (!customerName || !whatsappNumber) {
@@ -137,7 +131,6 @@ function CheckoutContent() {
             {product.description}
           </div>
           <div className="flex justify-between items-center text-xs pt-1.5 border-t border-border/40">
-            {/* JALUR DINAMIS TEKS HARGA: Jika panel, ubah tulisan jadi 'Mulai Dari' */}
             <span className="font-bold text-muted-foreground uppercase tracking-wide text-[10px]">
               {isPanel ? "Mulai Dari" : "Harga Satuan"}
             </span>
@@ -224,15 +217,14 @@ function CheckoutContent() {
             </div>
           </>
         ) : (
-          /* JIKA PRODUK PANEL: Tampilkan Notice Rapi Sebagai Pengganti Form Kosong */
+          /* JIKA PRODUK PANEL: Tampilkan Notice Rapi Pengganti Form */
           <div className="mb-5 bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-xs text-muted-foreground leading-relaxed shadow-sm">
-            💡 Untuk pemesanan layanan <strong>Panel Hosting</strong>, transaksi dan pemilihan spesifikasi paket dilakukan secara langsung via Telegram bersama Admin demi fleksibilitas konfigurasi server Anda.
+            💡 Untuk pemesanan layanan <strong>Panel Hosting</strong>, transaksi dan pemilihan spesifikasi paket dilakukan secara langsung melalui sistem otomatis kami di Bot Telegram.
           </div>
         )}
 
         {/* Tombol Aksi Bawah */}
         <div className="flex items-center gap-3 pt-3 border-t border-border mt-4">
-          {/* Tombol Batal */}
           <button 
             onClick={() => router.push("/#products")}
             className="flex-1 bg-background border border-border text-muted-foreground hover:text-foreground hover:bg-muted/40 font-bold text-xs py-3 rounded-xl text-center uppercase tracking-wider transition-all cursor-pointer"
@@ -240,7 +232,6 @@ function CheckoutContent() {
             Batal
           </button>
 
-          {/* Tombol Order/Beli */}
           <button
             onClick={handleActionBayar}
             className={`flex-1 font-bold text-xs py-3 rounded-xl text-center flex items-center justify-center gap-1.5 transition-all uppercase tracking-wider shadow-md cursor-pointer text-white ${
@@ -251,7 +242,7 @@ function CheckoutContent() {
           >
             {isPanel ? (
               <>
-                <MessageSquare className="w-3.5 h-3.5" /> Order via Tele
+                <MessageSquare className="w-3.5 h-3.5" /> Order via Bot Telegram
               </>
             ) : (
               "Beli Sekarang →"
@@ -261,7 +252,7 @@ function CheckoutContent() {
 
       </div>
 
-      {/* MODAL POP-UP QRIS (Hanya Terbuka untuk Script/App setelah validasi tombol) */}
+      {/* MODAL POP-UP QRIS */}
       {showQrisModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <div className="bg-card border border-border w-full max-w-sm rounded-2xl overflow-hidden relative shadow-2xl p-6 text-center">
