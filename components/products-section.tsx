@@ -1,20 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Server, Code, Smartphone } from "lucide-react";
+import { Server } from "lucide-react";
 import Link from "next/link";
 
 type Category = "semua" | "panel" | "script" | "app";
 
-interface Product {
+export interface Product {
   id: number;
   name: string;
   badge: string;
   badgeColor: string;
   price: number;
+  description: string;
   image?: string; 
   isNew?: boolean;
   categoryType: "panel" | "script" | "app";
+  features: string[];
 }
 
 const categories = [
@@ -24,17 +26,19 @@ const categories = [
   { id: "app", label: "App" },
 ];
 
-// DATABASE PUSAT: Samakan ID-nya dengan yang ada di checkout/page.tsx
-const ALL_PRODUCTS: Product[] = [
+// 📦 DATABASE UTAMA: Kita berikan kata "export" di depannya agar bisa di-import ke file checkout
+export const ALL_PRODUCTS: Product[] = [
   {
     id: 201,
     name: "Panel Pterodactyl",
     badge: "PANEL",
     badgeColor: "bg-[#6C3CE1]",
     price: 2000,
-    image: "", // Kosongkan jika ingin memakai fallback icon default Server
+    description: "Sewa panel server High Performance kualitas terbaik untuk bot WhatsApp pro dan game server Anda. Garansi penuh dan uptime maksimal.",
+    image: "", 
     isNew: true,
-    categoryType: "panel"
+    categoryType: "panel",
+    features: ["CPU & VPS stabil", "VPS legal", "Anti delay", "Uptime 24/7", "Anti suspend"]
   },
   {
     id: 1,
@@ -42,9 +46,11 @@ const ALL_PRODUCTS: Product[] = [
     badge: "SCRIPT",
     badgeColor: "bg-purple-600",
     price: 15000,
+    description: "PRO TEAM PLAN! Script JPM dengan fitur otomatisasi penyiaran pesan terlengkap, tanpa enkripsi, dan aman digunakan.",
     image: "/images/zenon-sc.jpg", 
     isNew: true,
-    categoryType: "script"
+    categoryType: "script",
+    features: ["SWGC", "Automation", "Push kontak", "All fitur work", "No enc"]
   },
   {
     id: 101,
@@ -52,9 +58,11 @@ const ALL_PRODUCTS: Product[] = [
     badge: "APP",
     badgeColor: "bg-[#6C3CE1]",
     price: 5000,
+    description: "Akun Alight Motion Pro berdurasi 1 tahun full premium tanpa watermark. Bisa pakai semua preset.",
     image: "/images/alightmotion.jpg",
     isNew: true,
-    categoryType: "app"
+    categoryType: "app",
+    features: ["Aktif 1 Tahun", "No Watermark", "Bisa pakai semua Preset", "Bergaransi"]
   }
 ];
 
@@ -66,7 +74,6 @@ function formatDisplayPrice(product: Product): string {
 export function ProductsSection() {
   const [activeCategory, setActiveCategory] = useState<Category>("semua");
 
-  // Memfilter produk berdasarkan tab kategori aktif
   const filteredProducts = ALL_PRODUCTS.filter(product => {
     if (activeCategory === "semua") return true;
     return product.categoryType === activeCategory;
@@ -96,47 +103,37 @@ export function ProductsSection() {
         {/* Info Total Item */}
         <div className="mb-6">
           <h2 className="text-xs text-muted-foreground uppercase tracking-wider font-bold">
-            {activeCategory === "semua"
-              ? "Semua Layanan"
-              : activeCategory === "panel"
-                ? "Panel Hosting"
-                : activeCategory === "script"
-                  ? "Source Code"
-                  : "Aplikasi Premium"}{" "}
+            {activeCategory === "semua" ? "Semua Layanan" : activeCategory === "panel" ? "Panel Hosting" : activeCategory === "script" ? "Source Code" : "Aplikasi Premium"}{" "}
             <span className="text-[#6C3CE1]">({filteredProducts.length})</span>
           </h2>
         </div>
 
-        {/* Grid Katalog Utama (Hanya Logo, Nama, Harga + Tombol ke Checkout) */}
+        {/* Grid Katalog Utama */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5">
           {filteredProducts.map((product) => (
             <div 
               key={product.id}
               className="bg-card border border-border rounded-[20px] overflow-hidden shadow-md hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 p-[12px] duration-300 flex flex-col h-full group"
             >
-              {/* Wadah Gambar/Logo */}
               <div className="relative h-[110px] w-full bg-zinc-200 dark:bg-zinc-800 rounded-[14px] overflow-hidden shrink-0 flex items-center justify-center">
                 {product.image ? (
                   <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                 ) : (
-                  /* Fallback Icon bawaan server jika tidak ada gambar */
                   <Server className="w-10 h-10 text-[#6C3CE1]" />
                 )}
                 
-                {/* Badge Status */}
                 <div className="absolute top-2 left-2">
                   {product.isNew && (
                     <span className="bg-gradient-to-r from-[#f43f5e] to-[#e11d48] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">HOT</span>
                   )}
                 </div>
                 <div className="absolute top-2 right-2">
-                  <span className={`${product.badgeColor} text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full shadow-sm uppercase`}>
+                  <span className="bg-[#6C3CE1] text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full shadow-sm uppercase">
                     {product.badge}
                   </span>
                 </div>
               </div>
 
-              {/* Teks Informasi & Tombol Navigasi Langsung */}
               <div className="pt-2.5 flex flex-col justify-between flex-1">
                 <div>
                   <h3 className="font-bold text-foreground text-sm group-hover:text-[#6C3CE1] dark:group-hover:text-purple-400 transition-colors line-clamp-1 leading-snug">
@@ -147,7 +144,6 @@ export function ProductsSection() {
                   </div>
                 </div>
 
-                {/* Tombol Melempar Data ID ke Halaman Checkout */}
                 <Link
                   href={`/checkout?id=${product.id}`}
                   className="w-full bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white text-[11px] font-bold py-2 rounded-xl text-center active:scale-95 transition-all block shadow-sm shadow-[#6C3CE1]/15 uppercase tracking-wide cursor-pointer"
