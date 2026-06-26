@@ -26,26 +26,26 @@ export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-8 bg-[#0c0c1e] px-3 sm:px-6">
+    <section id="faq" className="py-8 bg-background text-foreground px-3 sm:px-6 transition-colors duration-300">
       <div className="max-w-3xl mx-auto">
         {/* Section Header */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
             <HelpCircle className="w-5 h-5 text-[#6C3CE1]" />
-            <h2 className="text-lg font-bold text-white">Pertanyaan Umum</h2>
+            <h2 className="text-lg font-bold text-foreground">Pertanyaan Umum</h2>
           </div>
-          <p className="text-zinc-400 text-xs sm:text-sm">Jawaban untuk pertanyaan yang sering ditanyakan</p>
+          <p className="text-muted-foreground text-xs sm:text-sm">Jawaban untuk pertanyaan yang sering ditanyakan</p>
         </div>
 
         {/* FAQ List Tano Pedia Card Style */}
-        <div className="bg-white border border-[#6c3ce1]/5 rounded-[20px] overflow-hidden shadow-[0_8px_25px_rgba(108,60,225,0.04)]">
+        <div className="bg-card border border-border rounded-[20px] overflow-hidden shadow-xl transition-colors duration-300">
           {faqs.map((faq, index) => (
-            <div key={index} className={index !== faqs.length - 1 ? "border-b border-[#6c3ce1]/6" : ""}>
+            <div key={index} className={index !== faqs.length - 1 ? "border-b border-border" : ""}>
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-4 text-left hover:bg-[#6c3ce1]/5 transition-colors gap-3"
+                className="w-full flex items-center justify-between p-4 text-left hover:bg-[#6c3ce1]/5 transition-colors gap-3 cursor-pointer"
               >
-                <span className="flex items-center gap-2.5 text-xs sm:text-sm text-zinc-800 font-bold">
+                <span className="flex items-center gap-2.5 text-xs sm:text-sm text-foreground font-bold">
                   <ChevronRight
                     className={`w-4 h-4 text-[#6C3CE1] transition-transform flex-shrink-0 ${
                       openIndex === index ? "rotate-90" : ""
@@ -56,7 +56,7 @@ export function FAQSection() {
               </button>
               {openIndex === index && (
                 <div className="px-4 pb-4 pl-10">
-                  <p className="text-xs sm:text-sm text-zinc-500 font-medium leading-relaxed">
+                  <p className="text-xs sm:text-sm text-muted-foreground font-medium leading-relaxed">
                     {faq.answer}
                   </p>
                 </div>
