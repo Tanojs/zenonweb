@@ -17,7 +17,7 @@ interface Script {
   description: string;
   image?: string; 
   isNew?: boolean;
-  features: string[]; // Tambahkan ini agar tidak error
+  features: string[];
 }
 
 const categories = [
@@ -32,7 +32,7 @@ const scripts: Script[] = [
     id: 1,
     name: "Script Zenon JPM",
     badge: "SCRIPT",
-    badgeColor: "bg-violet-500",
+    badgeColor: "bg-purple-600",
     price: 15000,
     rating: 5.0,
     reviews: 64,
@@ -48,7 +48,7 @@ const apps: Script[] = [
     id: 101,
     name: "ALIGHT MOTION",
     badge: "APP",
-    badgeColor: "bg-blue-500",
+    badgeColor: "bg-[#6C3CE1]",
     price: 5000,
     rating: 4.9,
     reviews: 24,
@@ -89,62 +89,61 @@ function formatPrice(price: number): string {
 
 function ScriptCard({ script }: { script: Script }) {
   return (
-    <div className="bg-zinc-900/90 border border-zinc-700/80 rounded-xl overflow-hidden hover:border-teal-400/60 transition-all hover:-translate-y-1 group flex flex-col h-full">
-      <div className="relative aspect-[4/3] bg-zinc-800 overflow-hidden">
+    <div className="bg-white border border-[#6c3ce1]/5 rounded-[20px] overflow-hidden shadow-[0_8px_28px_rgba(108,60,225,0.06)] hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 group flex flex-col h-full p-[12px]">
+      <div className="relative h-[110px] w-full bg-[#eae6f5] rounded-[14px] overflow-hidden shrink-0">
         <img 
           src={script.image || "/placeholder-script.jpg"} 
           alt={script.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-100 group-hover:opacity-100"
+          className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
         />
-
         <div className="absolute top-2 left-2 flex gap-1">
           {script.isNew && (
-            <span className="bg-rose-500 text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded shadow-sm">
-              BARU
+            <span className="bg-gradient-to-r from-[#f43f5e] to-[#e11d48] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+              HOT
             </span>
           )}
         </div>
         <div className="absolute top-2 right-2">
-          <span className={`${script.badgeColor} text-white text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded shadow-sm`}>
+          <span className={`${script.badgeColor} text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full shadow-sm uppercase tracking-[0.5px]`}>
             {script.badge}
           </span>
         </div>
       </div>
 
-      <div className="p-3 sm:p-4 flex flex-col flex-1">
-        <h3 className="font-semibold text-white text-xs sm:text-sm mb-1 group-hover:text-teal-400 transition-colors line-clamp-1">
+      <div className="pt-3 flex flex-col flex-1">
+        <h3 className="font-bold text-[#1a1a2e] text-sm mb-0.5 group-hover:text-[#6C3CE1] transition-colors line-clamp-1 leading-[1.2]">
           {script.name}
         </h3>
-        <p className="text-[10px] sm:text-xs text-zinc-400 mb-2 sm:mb-3 line-clamp-2">{script.description}</p>
+        <p className="text-[11px] font-medium text-[#8a8aa8] mb-3 line-clamp-2">{script.description}</p>
         
-        {/* Fitur Produk */}
-        <div className="flex-1 space-y-1.5 mb-4">
+        {/* Fitur */}
+        <div className="flex-1 space-y-1 mb-4">
           {script.features?.map((feat, i) => (
             <div key={i} className="flex items-center gap-1.5">
-              <Check className="w-3 h-3 text-teal-400 shrink-0" />
-              <span className="text-[9px] sm:text-[10px] text-zinc-300 line-clamp-1">{feat}</span>
+              <Check className="w-3 h-3 text-[#6C3CE1] shrink-0" />
+              <span className="text-[10px] text-zinc-600 font-medium line-clamp-1">{feat}</span>
             </div>
           ))}
         </div>
 
-        <div className="flex items-center gap-1 mb-2 sm:mb-3 mt-auto">
+        <div className="flex items-center gap-1 mb-3 mt-auto">
           <div className="flex">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400" />
+              <Star key={i} className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
             ))}
           </div>
-          <span className="text-[10px] sm:text-xs text-zinc-400">
-            {script.rating} ({script.reviews})
+          <span className="text-[10px] text-zinc-400">
+            {script.rating}
           </span>
         </div>
         
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-teal-400 font-bold text-sm sm:text-base">{formatPrice(script.price)}</div>
+        <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-[#6c3ce1]/6">
+          <div className="text-[#6C3CE1] font-bold text-sm sm:text-base">{formatPrice(script.price)}</div>
           <Link
             href={`/checkout?type=${script.badge.toLowerCase()}&id=${script.id}&name=${encodeURIComponent(script.name)}&price=${script.price}`}
-            className="bg-teal-500 hover:bg-teal-400 text-black text-[10px] sm:text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors shadow-lg shadow-teal-500/20"
+            className="bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white text-[11px] font-bold px-4 py-1.5 rounded-full shadow-md shadow-[#6C3CE1]/15 active:scale-95 transition-all"
           >
-            Order
+            Beli
           </Link>
         </div>
       </div>
@@ -155,7 +154,7 @@ function ScriptCard({ script }: { script: Script }) {
 function PanelPricing() {
   return (
     <div>
-      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3 mb-4 sm:mb-6">
+      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3 mb-4">
         {pricingPlans.map((plan, index) => {
           const Icon = plan.icon;
           const planId = `panel-${plan.ram.toLowerCase()}`;
@@ -165,64 +164,64 @@ function PanelPricing() {
             <Link
               key={index}
               href={checkoutUrl}
-              className={`relative bg-zinc-900/90 border rounded-xl p-3 sm:p-4 text-center transition-all hover:-translate-y-1 hover:shadow-lg block ${
+              className={`relative bg-white border rounded-[20px] p-3.5 text-center transition-all hover:-translate-y-1 hover:shadow-lg block ${
                 plan.highlight
-                  ? "border-teal-400 ring-2 ring-teal-400/30 hover:shadow-teal-500/20"
+                  ? "border-[#6C3CE1] ring-2 ring-[#6C3CE1]/10 shadow-[0_8px_25px_rgba(108,60,225,0.08)]"
                   : plan.isUnlimited
-                    ? "border-amber-400 ring-2 ring-amber-400/30 col-span-2 xs:col-span-1 hover:shadow-amber-500/20"
-                    : "border-zinc-700/80 hover:border-teal-400/50"
+                    ? "border-amber-400 ring-2 ring-amber-400/10 col-span-2 xs:col-span-1"
+                    : "border-[#6c3ce1]/8 hover:border-[#6C3CE1]/50 shadow-[0_4px_15px_rgba(108,60,225,0.02)]"
               }`}
             >
               {plan.label && (
-                <div className="absolute -top-2.5 sm:-top-3 left-1/2 -translate-x-1/2">
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
                   <span
-                    className={`inline-flex items-center gap-0.5 sm:gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[8px] sm:text-[10px] font-bold rounded-full whitespace-nowrap ${
+                    className={`inline-flex items-center gap-0.5 px-2.5 py-0.5 text-[9px] font-bold rounded-full whitespace-nowrap uppercase tracking-wide ${
                       plan.isUnlimited
                         ? "bg-amber-400 text-black"
                         : plan.highlight
-                          ? "bg-teal-400 text-black"
-                          : "bg-zinc-700 text-zinc-300"
+                          ? "bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white"
+                          : "bg-zinc-200 text-zinc-600"
                     }`}
                   >
-                    {Icon && <Icon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />}
+                    {Icon && <Icon className="w-2.5 h-2.5" />}
                     {plan.label}
                   </span>
                 </div>
               )}
-              <Server className={`w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1.5 sm:mb-2 ${
-                plan.isUnlimited ? "text-amber-400" : plan.highlight ? "text-teal-400" : "text-zinc-500"
+              <Server className={`w-5 h-5 mx-auto mb-1.5 ${
+                plan.isUnlimited ? "text-amber-400" : plan.highlight ? "text-[#6C3CE1]" : "text-zinc-400"
               }`} />
-              <div className={`text-xl sm:text-2xl md:text-3xl font-bold mb-0.5 sm:mb-1 ${
-                plan.isUnlimited ? "text-amber-400" : plan.highlight ? "text-teal-400" : "text-white"
+              <div className={`text-xl font-extrabold italic leading-none mb-1 ${
+                plan.isUnlimited ? "text-amber-400" : plan.highlight ? "text-[#6C3CE1]" : "text-[#1a1a2e]"
               }`}>
                 {plan.ram}
               </div>
-              <div className="text-sm sm:text-base text-teal-400 font-bold mb-2 sm:mb-3">
+              <div className="text-xs text-[#6C3CE1] font-bold mb-3">
                 {formatPrice(plan.price)}
               </div>
-              <span className={`block text-[10px] sm:text-xs font-bold py-1.5 sm:py-2 rounded-lg transition-colors ${
+              <span className={`block text-[11px] font-bold py-1.5 rounded-full transition-all active:scale-95 ${
                 plan.isUnlimited
-                  ? "bg-amber-400 hover:bg-amber-300 text-black"
+                  ? "bg-amber-400 text-black"
                   : plan.highlight
-                    ? "bg-teal-500 hover:bg-teal-400 text-black"
-                    : "bg-teal-500/20 hover:bg-teal-500 text-teal-400 hover:text-black"
+                    ? "bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white shadow-md shadow-[#6C3CE1]/20"
+                    : "bg-[#6c3ce1]/8 text-[#6C3CE1] hover:bg-[#6C3CE1] hover:text-white"
               }`}>
-                Order
+                Beli
               </span>
             </Link>
           );
         })}
       </div>
 
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 sm:p-6">
-        <h3 className="text-[10px] sm:text-xs font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4 text-center">
-          Keunggulan Panel ZenonStore
+      <div className="bg-white border border-[#6c3ce1]/5 rounded-[20px] p-4 sm:p-5 shadow-[0_6px_22px_rgba(108,60,225,0.03)]">
+        <h3 className="text-[10px] font-bold text-[#8a8aa8] uppercase tracking-[0.2em] mb-4 text-center">
+          Keunggulan Panel TanoPedia Style
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {panelFeatures.map((feature, i) => (
-            <div key={i} className="flex items-center gap-2 bg-zinc-900/80 p-2.5 rounded-lg border border-zinc-800/50">
-              <Check className="w-3.5 h-3.5 text-teal-400" />
-              <span className="text-[11px] sm:text-xs text-zinc-300">{feature}</span>
+            <div key={i} className="flex items-center gap-2 bg-[#f3f0fa]/50 p-2.5 rounded-xl border border-[#6c3ce1]/5">
+              <Check className="w-3.5 h-3.5 text-[#6C3CE1]" />
+              <span className="text-xs text-zinc-600 font-medium">{feature}</span>
             </div>
           ))}
         </div>
@@ -243,17 +242,18 @@ export function ProductsSection() {
   };
 
   return (
-    <section id="products" className="py-8 sm:py-10 lg:py-12 px-3 sm:px-4 lg:px-6">
+    <section id="products" className="py-8 sm:py-10 bg-[#0c0c1e] px-3 sm:px-6">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-wrap gap-2 mb-6 sm:mb-8">
+        {/* Kategori Tabs Tano Pedia Style */}
+        <div className="flex flex-wrap gap-2 mb-6 overflow-x-auto pb-1 no-scrollbar">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id as Category)}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
+              className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
                 activeCategory === cat.id
-                  ? "bg-teal-500 text-black shadow-lg shadow-teal-500/30"
-                  : "bg-zinc-800/80 border border-zinc-600 text-zinc-300 hover:border-teal-400 hover:text-teal-400"
+                  ? "bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white shadow-lg shadow-[#6C3CE1]/30"
+                  : "bg-white border border-[#6c3ce1]/5 text-[#4a4a6a] hover:border-[#6C3CE1] hover:text-[#6C3CE1]"
               }`}
             >
               {cat.label}
@@ -261,25 +261,25 @@ export function ProductsSection() {
           ))}
         </div>
 
-        <div className="mb-4 sm:mb-6">
-          <h2 className="text-xs sm:text-sm text-zinc-400 uppercase tracking-wider font-medium">
+        <div className="mb-4">
+          <h2 className="text-xs text-zinc-400 uppercase tracking-wider font-bold">
             {activeCategory === "semua"
-              ? "Semua Produk"
+              ? "Semua Layanan"
               : activeCategory === "panel"
-                ? "Panel"
+                ? "Panel Hosting"
                 : activeCategory === "script"
                   ? "Source Code"
-                  : "Aplikasi"}{" "}
-            <span className="text-teal-400">({getItemCount()})</span>
+                  : "Aplikasi Premium"}{" "}
+            <span className="text-[#6C3CE1]">({getItemCount()})</span>
           </h2>
         </div>
 
         {/* --- ID PANEL --- */}
         {(activeCategory === "semua" || activeCategory === "panel") && (
-          <div id="panel" className="mb-8 sm:mb-10 scroll-mt-24">
+          <div id="panel" className="mb-8 scroll-mt-24">
             {activeCategory === "semua" && (
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-5 flex items-center gap-2">
-                <Server className="w-5 h-5 text-teal-400" />
+              <h3 className="text-base sm:text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <Server className="w-4 h-4 text-[#6C3CE1]" />
                 Panel Hosting
               </h3>
             )}
@@ -289,14 +289,14 @@ export function ProductsSection() {
 
         {/* --- ID SCRIPT --- */}
         {(activeCategory === "semua" || activeCategory === "script") && (
-          <div id="script" className="mb-8 sm:mb-10 scroll-mt-24">
+          <div id="script" className="mb-8 scroll-mt-24">
             {activeCategory === "semua" && (
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-5 mt-8 sm:mt-10 flex items-center gap-2">
-                <Code className="w-5 h-5 text-teal-400" />
+              <h3 className="text-base sm:text-lg font-bold text-white mb-4 mt-8 flex items-center gap-2">
+                <Code className="w-4 h-4 text-[#6C3CE1]" />
                 Source Code
               </h3>
             )}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 text-zinc-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5">
               {scripts.map((script) => (
                 <ScriptCard key={script.id} script={script} />
               ))}
@@ -308,12 +308,12 @@ export function ProductsSection() {
         {(activeCategory === "semua" || activeCategory === "app") && (
           <div id="app" className="scroll-mt-24">
             {activeCategory === "semua" && (
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-5 mt-8 sm:mt-10 flex items-center gap-2">
-                <Smartphone className="w-5 h-5 text-teal-400" />
+              <h3 className="text-base sm:text-lg font-bold text-white mb-4 mt-8 flex items-center gap-2">
+                <Smartphone className="w-4 h-4 text-[#6C3CE1]" />
                 Aplikasi Premium
               </h3>
             )}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 text-zinc-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5">
               {apps.map((app) => (
                 <ScriptCard key={app.id} script={app} />
               ))}
