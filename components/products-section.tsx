@@ -89,8 +89,8 @@ function formatPrice(price: number): string {
 
 function ScriptCard({ script }: { script: Script }) {
   return (
-    <div className="bg-[#1a1a2e] border border-white/5 rounded-[20px] overflow-hidden shadow-xl hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 group flex flex-col h-full p-[12px]">
-      <div className="relative h-[110px] w-full bg-zinc-800 rounded-[14px] overflow-hidden shrink-0">
+    <div className="bg-card border border-border rounded-[20px] overflow-hidden shadow-xl hover:border-[#6C3CE1]/40 transition-all hover:-translate-y-1 group flex flex-col h-full p-[12px] duration-300">
+      <div className="relative h-[110px] w-full bg-zinc-200 dark:bg-zinc-800 rounded-[14px] overflow-hidden shrink-0">
         <img 
           src={script.image || "/placeholder-script.jpg"} 
           alt={script.name}
@@ -111,17 +111,17 @@ function ScriptCard({ script }: { script: Script }) {
       </div>
 
       <div className="pt-3 flex flex-col flex-1">
-        <h3 className="font-bold text-white text-sm mb-0.5 group-hover:text-[#6C3CE1] transition-colors line-clamp-1 leading-[1.2]">
+        <h3 className="font-bold text-foreground text-sm mb-0.5 group-hover:text-[#6C3CE1] dark:group-hover:text-purple-400 transition-colors line-clamp-1 leading-[1.2]">
           {script.name}
         </h3>
-        <p className="text-[11px] font-medium text-zinc-400 mb-3 line-clamp-2">{script.description}</p>
-        
+        <p className="text-[11px] font-medium text-muted-foreground mb-3 line-clamp-2">{script.description}</p>
+
         {/* Fitur */}
         <div className="flex-1 space-y-1 mb-4">
           {script.features?.map((feat, i) => (
             <div key={i} className="flex items-center gap-1.5">
               <Check className="w-3 h-3 text-[#6C3CE1] shrink-0" />
-              <span className="text-[10px] text-zinc-300 font-medium line-clamp-1">{feat}</span>
+              <span className="text-[10px] text-foreground/80 font-medium line-clamp-1">{feat}</span>
             </div>
           ))}
         </div>
@@ -132,16 +132,16 @@ function ScriptCard({ script }: { script: Script }) {
               <Star key={i} className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
             ))}
           </div>
-          <span className="text-[10px] text-zinc-400">
+          <span className="text-[10px] text-muted-foreground">
             {script.rating}
           </span>
         </div>
-        
-        <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-white/5">
-          <div className="text-[#6C3CE1] font-bold text-sm sm:text-base">{formatPrice(script.price)}</div>
+
+        <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-border">
+          <div className="text-[#6C3CE1] dark:text-purple-400 font-bold text-sm sm:text-base">{formatPrice(script.price)}</div>
           <Link
             href={`/checkout?type=${script.badge.toLowerCase()}&id=${script.id}&name=${encodeURIComponent(script.name)}&price=${script.price}`}
-            className="bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white text-[11px] font-bold px-4 py-1.5 rounded-full shadow-md shadow-[#6C3CE1]/15 active:scale-95 transition-all"
+            className="bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white text-[11px] font-bold px-4 py-1.5 rounded-full shadow-md shadow-[#6C3CE1]/15 active:scale-95 transition-all cursor-pointer"
           >
             Beli
           </Link>
@@ -164,12 +164,12 @@ function PanelPricing() {
             <Link
               key={index}
               href={checkoutUrl}
-              className={`relative bg-[#1a1a2e] border rounded-[20px] p-3.5 text-center transition-all hover:-translate-y-1 hover:shadow-lg block ${
+              className={`relative bg-card text-foreground border rounded-[20px] p-3.5 text-center transition-all hover:-translate-y-1 hover:shadow-lg block duration-300 ${
                 plan.highlight
                   ? "border-[#6C3CE1] ring-2 ring-[#6C3CE1]/20 shadow-[0_8px_25px_rgba(108,60,225,0.15)]"
                   : plan.isUnlimited
                     ? "border-amber-400 ring-2 ring-amber-400/20 col-span-2 xs:col-span-1"
-                    : "border-white/5 hover:border-[#6C3CE1]/50 shadow-md"
+                    : "border-border hover:border-[#6C3CE1]/50 shadow-md"
               }`}
             >
               {plan.label && (
@@ -180,7 +180,7 @@ function PanelPricing() {
                         ? "bg-amber-400 text-black"
                         : plan.highlight
                           ? "bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white"
-                          : "bg-zinc-800 text-zinc-300"
+                          : "bg-muted text-muted-foreground border border-border"
                     }`}
                   >
                     {Icon && <Icon className="w-2.5 h-2.5" />}
@@ -189,14 +189,14 @@ function PanelPricing() {
                 </div>
               )}
               <Server className={`w-5 h-5 mx-auto mb-1.5 ${
-                plan.isUnlimited ? "text-amber-400" : plan.highlight ? "text-[#6C3CE1]" : "text-zinc-500"
+                plan.isUnlimited ? "text-amber-400" : plan.highlight ? "text-[#6C3CE1]" : "text-muted-foreground"
               }`} />
               <div className={`text-xl font-extrabold italic leading-none mb-1 ${
-                plan.isUnlimited ? "text-amber-400" : plan.highlight ? "text-[#6C3CE1]" : "text-white"
+                plan.isUnlimited ? "text-amber-400" : plan.highlight ? "text-[#6C3CE1]" : "text-foreground"
               }`}>
                 {plan.ram}
               </div>
-              <div className="text-xs text-teal-400 font-bold mb-3">
+              <div className="text-xs text-[#6C3CE1] dark:text-purple-400 font-bold mb-3">
                 {formatPrice(plan.price)}
               </div>
               <span className={`block text-[11px] font-bold py-1.5 rounded-full transition-all active:scale-95 ${
@@ -204,7 +204,7 @@ function PanelPricing() {
                   ? "bg-amber-400 text-black"
                   : plan.highlight
                     ? "bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white shadow-md shadow-[#6C3CE1]/20"
-                    : "bg-[#6c3ce1]/20 text-[#6C3CE1] hover:bg-[#6C3CE1] hover:text-white"
+                    : "bg-[#6c3ce1]/10 dark:bg-[#6c3ce1]/20 text-[#6C3CE1] dark:text-purple-300 hover:bg-[#6C3CE1] hover:text-white dark:hover:bg-[#6C3CE1]"
               }`}>
                 Beli
               </span>
@@ -213,15 +213,15 @@ function PanelPricing() {
         })}
       </div>
 
-      <div className="bg-[#1a1a2e]/50 border border-white/5 rounded-[20px] p-4 sm:p-5 shadow-xl">
-        <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-4 text-center">
+      <div className="bg-card/50 border border-border rounded-[20px] p-4 sm:p-5 shadow-xl duration-300">
+        <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 text-center">
           Keunggulan Panel TanoPedia Style
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {panelFeatures.map((feature, i) => (
-            <div key={i} className="flex items-center gap-2 bg-[#1a1a2e] p-2.5 rounded-xl border border-white/5">
+            <div key={i} className="flex items-center gap-2 bg-card p-2.5 rounded-xl border border-border duration-300">
               <Check className="w-3.5 h-3.5 text-[#6C3CE1]" />
-              <span className="text-xs text-zinc-300 font-medium">{feature}</span>
+              <span className="text-xs text-foreground/90 font-medium">{feature}</span>
             </div>
           ))}
         </div>
@@ -229,7 +229,7 @@ function PanelPricing() {
     </div>
   );
 }
-      
+
 export function ProductsSection() {
   const [activeCategory, setActiveCategory] = useState<Category>("semua");
 
@@ -242,7 +242,7 @@ export function ProductsSection() {
   };
 
   return (
-    <section id="products" className="py-8 bg-[#0c0c1e] px-3 sm:px-6">
+    <section id="products" className="py-8 bg-background text-foreground px-3 sm:px-6 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         {/* Kategori Tabs */}
         <div className="flex flex-wrap gap-2 mb-6 overflow-x-auto pb-1 no-scrollbar">
@@ -253,7 +253,7 @@ export function ProductsSection() {
               className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
                 activeCategory === cat.id
                   ? "bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white shadow-lg shadow-[#6C3CE1]/30"
-                  : "bg-[#1a1a2e] border border-white/5 text-zinc-300 hover:border-[#6C3CE1] hover:text-[#6C3CE1]"
+                  : "bg-card border border-border text-muted-foreground hover:border-[#6C3CE1] hover:text-[#6C3CE1]"
               }`}
             >
               {cat.label}
@@ -262,7 +262,7 @@ export function ProductsSection() {
         </div>
 
         <div className="mb-4">
-          <h2 className="text-xs text-zinc-400 uppercase tracking-wider font-bold">
+          <h2 className="text-xs text-muted-foreground uppercase tracking-wider font-bold">
             {activeCategory === "semua"
               ? "Semua Layanan"
               : activeCategory === "panel"
@@ -278,7 +278,7 @@ export function ProductsSection() {
         {(activeCategory === "semua" || activeCategory === "panel") && (
           <div id="panel" className="mb-8 scroll-mt-24">
             {activeCategory === "semua" && (
-              <h3 className="text-base sm:text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <h3 className="text-base sm:text-lg font-bold text-foreground mb-4 flex items-center gap-2">
                 <Server className="w-4 h-4 text-[#6C3CE1]" />
                 Panel Hosting
               </h3>
@@ -291,7 +291,7 @@ export function ProductsSection() {
         {(activeCategory === "semua" || activeCategory === "script") && (
           <div id="script" className="mb-8 scroll-mt-24">
             {activeCategory === "semua" && (
-              <h3 className="text-base sm:text-lg font-bold text-white mb-4 mt-8 flex items-center gap-2">
+              <h3 className="text-base sm:text-lg font-bold text-foreground mb-4 mt-8 flex items-center gap-2">
                 <Code className="w-4 h-4 text-[#6C3CE1]" />
                 Source Code
               </h3>
@@ -308,7 +308,7 @@ export function ProductsSection() {
         {(activeCategory === "semua" || activeCategory === "app") && (
           <div id="app" className="scroll-mt-24">
             {activeCategory === "semua" && (
-              <h3 className="text-base sm:text-lg font-bold text-white mb-4 mt-8 flex items-center gap-2">
+              <h3 className="text-base sm:text-lg font-bold text-foreground mb-4 mt-8 flex items-center gap-2">
                 <Smartphone className="w-4 h-4 text-[#6C3CE1]" />
                 Aplikasi Premium
               </h3>
