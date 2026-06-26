@@ -29,7 +29,7 @@ export function FloatingWhatsApp() {
 
     // Logika Snap ke pinggir terdekat
     if (endX > width / 2) {
-      // Kembali ke posisi kanan asli (right-5)
+      // Kembali ke posisi kanan asli
       targetX = 0;
       setIsLeft(false);
     } else {
@@ -51,7 +51,8 @@ export function FloatingWhatsApp() {
   if (!isMounted) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-center">
+    // 📌 PERUBAHAN: Mengubah 'bottom-5' menjadi 'bottom-24' agar berada di atas bottom navigation
+    <div className="fixed bottom-24 right-5 z-50 flex flex-col items-center">
       
       {/* 🔮 MINI POP-UP MENU PILIHAN HUBUNGI KAMI */}
       <AnimatePresence>
@@ -96,20 +97,21 @@ export function FloatingWhatsApp() {
         )}
       </AnimatePresence>
 
-      {/* 🔘 TOMBOL UTAMA (IKON DIUBAH JADI HEADPHONES CS) */}
+      {/* 🔘 TOMBOL UTAMA CUSTOMER SERVICE */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         
-        // KONFIGURASI DRAG BAWAAN ASLIMU
+        // KONFIGURASI DRAG
         drag
         dragSnapToOrigin={false} 
         dragElastic={0}
         dragMomentum={false}
         animate={controls}
         onDragEnd={handleDragEnd}
+        // 📌 PERUBAHAN: Mengurangi bottom constraints menjadi 20 agar saat ditarik ke bawah tidak mentok menutupi navigasi bawah
         dragConstraints={{
-          top: -window.innerHeight + 100,
-          bottom: 50,
+          top: -window.innerHeight + 180,
+          bottom: 20,
           left: -window.innerWidth + 100,
           right: 50
         }}
@@ -126,7 +128,6 @@ export function FloatingWhatsApp() {
           <X className="w-5 h-5" />
         ) : (
           <>
-            {/* Menggunakan Ikon Headphones biar mirip CS asli */}
             <Headphones className="w-5 h-5" />
             <span className="absolute inset-0 rounded-full bg-[#6C3CE1] animate-ping opacity-25 pointer-events-none" />
           </>
