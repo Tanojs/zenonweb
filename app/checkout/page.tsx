@@ -245,17 +245,13 @@ function CheckoutContent() {
 
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-600 mb-1">NOMOR WHATSAPP AKTIF</label>
-            <div className="flex items-center border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-purple-600 overflow-hidden">
-              <span className="bg-gray-100 px-3 py-3 text-gray-600 font-bold text-sm border-r border-gray-200">+</span>
-              <input
-                type="tel"
-                value={whatsappNumber}
-                onChange={(e) => setWhatsappNumber(e.target.value)}
-                placeholder="62812xxxxxxxx"
-                className="flex-1 p-3 focus:outline-none text-sm"
-              />
-            </div>
-            <p className="text-xs text-gray-400 mt-1">Contoh: 62812xxxxxxxx (kode negara + nomor)</p>
+            <input
+              type="tel"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              placeholder="62812xxxxxx"
+              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm"
+            />
           </div>
 
           <div className="flex justify-between items-center border-t border-gray-200 pt-4 mb-6">
