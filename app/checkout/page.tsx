@@ -1,33 +1,43 @@
 "use client";
-import { useState } from "react";
-import { QRCodeSVG } from 'qrcode.react'; // <--- Import ini
 
-// ... (kode lainnya tetap)
+import { useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { ALL_PRODUCTS } from "@/components/products-section";
+import { QRCodeSVG } from 'qrcode.react';
+import { X, Loader2 } from "lucide-react";
 
 function CheckoutContent() {
-  const [qrString, setQrString] = useState<string>(""); // State baru
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [qrString, setQrString] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [quantity, setQuantity] = useState<number>(1);
+
+  const productId = parseInt(searchParams.get("id") || "0");
+  const product = ALL_PRODUCTS.find((p) => p.id === productId);
+
+  if (!product) return <div className="p-10 text-center">Produk tidak ditemukan</div>;
 
   const handleActionBayar = async () => {
-    // ... (validasi nama/wa tetap sama)
     setLoading(true);
-    
-    const response = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ price: product.price, quantity })
-    });
-
-    const res = await response.json();
-    if (res.success) {
-      setQrString(res.qrString); // Simpan string agar QR muncul
-    } else {
-      alert("Error: " + res.error);
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ price: product.price, quantity })
+      });
+      const res = await response.json();
+      if (res.success) {
+        setQrString(res.qrString);
+      } else {
+        alert("Error: " + res.error);
+      }
+    } catch (e) {
+      alert("Terjadi kesalahan");
     }
     setLoading(false);
   };
 
-  // Tampilan jika QR sudah ada
   if (qrString) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background">
@@ -36,12 +46,32 @@ function CheckoutContent() {
           <div className="bg-white p-2 inline-block rounded-lg">
              <QRCodeSVG value={qrString} size={250} />
           </div>
-          <p className="text-xs text-muted-foreground mt-4">Tunjukkan kode ini ke aplikasi DANA/GOPAY/OVO Anda.</p>
-          <button onClick={() => window.location.reload()} className="mt-6 bg-purple-600 text-white px-6 py-2 rounded-xl text-xs font-bold">Selesai / Batal</button>
+          <p className="text-xs text-muted-foreground mt-4">Scan di DANA, GOPAY, atau OVO Anda.</p>
+          <button onClick={() => window.location.reload()} className="mt-6 bg-purple-600 text-white px-6 py-2 rounded-xl text-xs font-bold">Kembali</button>
         </div>
       </div>
     );
   }
 
-  // ... (tampilan form awal tetap sama seperti sebelumnya)
+  return (
+    <div className="p-6">
+      <h1 className="text-xl font-bold mb-4">{product.name}</h1>
+      <button 
+        onClick={handleActionBayar} 
+        disabled={loading}
+        className="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold"
+      >
+        {loading ? "Memproses..." : "Bayar Sekarang"}
+      </button>
+    </div>
+  );
+}
+
+// ⚠️ INI BAGIAN YANG PENTING AGAR BUILD SUKSES
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
+      <CheckoutContent />
+    </Suspense>
+  );
 }
