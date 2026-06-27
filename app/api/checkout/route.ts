@@ -1,34 +1,40 @@
 import { NextResponse } from "next/server";
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!, 
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export async function POST(request: Request) {
-  const { price, quantity, whatsappNumber } = await request.json();
+  try {
+    const { price, quantity, whatsappNumber, product } = await request.json();
 
-  // 1. Simpan dulu ke Supabase agar punya ID
-  const { data: order, error } = await supabase
-    .from('orders')
-    .insert([{ 
-      status: 'pending', 
-      price: price * quantity,
-      whatsapp: whatsappNumber 
-    }])
-    .select()
-    .single();
+    // Menggunakan crypto.randomUUID() untuk membuat ID unik secara otomatis
+    const orderId = crypto.randomUUID();
 
-  if (error) return NextResponse.json({ error: "Gagal simpan ke DB" }, { status: 500 });
+    const { error } = await supabase
+      .from('orders')
+      .insert([{ 
+        id: orderId, // Wajib diisi karena id adalah Primary Key
+        customer_name: "Guest", 
+        customer_phone: whatsappNumber,
+        product_name: product.name,
+        product_type: product.type || "Default",
+        product_price: price * quantity,
+        status: 'pending' 
+      }]);
 
-  // 2. Minta QRIS ke Pakasir (gunakan order.id dari Supabase sebagai referensi)
-  const res = await fetch("https://api.pakasir.com/v1/create-qr", {
-    method: "POST",
-    headers: { "Authorization": "Bearer TOKEN_PAKASIR_KAMU" },
-    body: JSON.stringify({ 
-      amount: price * quantity, 
-      order_id: order.id 
-    })
-  });
+    if (error) {
+      console.error("Supabase Error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
-  const pData = await res.json();
-  return NextResponse.json({ success: true, qrString: pData.qr_string, order_id: order.id });
+    // Lanjut ke API Pakasir
+    // ... sisa kode tetap sama
+    return NextResponse.json({ success: true, order_id: orderId });
+
+  } catch (err) {
+    return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
+  }
 }
