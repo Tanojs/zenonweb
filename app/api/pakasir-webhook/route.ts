@@ -4,20 +4,20 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
 
-    console.log("=== WEBHOOK MASUK FROM PAKASIR ===");
-    console.log(data);
+    // 1. Log ini untuk memastikan data benar-benar masuk ke sistem
+    console.log("=== WEBHOOK MASUK ===");
+    console.log("Payload diterima:", JSON.stringify(data));
 
     const paymentStatus = data.status; 
+    const customerPhone = data.customer_phone;
+    const productName = data.product_name;
 
+    // 2. Cek apakah Pakasir benar-benar mengirim status yang kita harapkan
     if (paymentStatus === "completed" || paymentStatus === "paid") {
-      const customerPhone = data.customer_phone;
-      const productName = data.product_name;
+      
+      console.log(`Status terdeteksi: ${paymentStatus}. Mencoba kirim WA...`);
 
-      // LOGIKA PENGIRIMAN PRODUK VIA API WHATSAPP
-      // Ganti link di bawah dengan link file asli milikmu
-      const fileLink = "https://drive.google.com/file/d/link-file-kamu";
-
-      await fetch("https://api.fonnte.com/send", {
+      const response = await fetch("https://api.fonnte.com/send", {
         method: "POST",
         headers: {
           "Authorization": process.env.FONNTE_API_TOKEN || "",
@@ -25,16 +25,22 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           target: customerPhone,
-          message: `Halo! Pembayaran ${productName} sukses. Ini adalah file/lisensi Anda: ${fileLink}`,
+          message: `Halo! Pembayaran ${productName} sukses. Link: https://drive.google.com/file/d/link-file-kamu`,
         }),
       });
 
-      console.log(`[SUKSES] Produk telah dikirim ke ${customerPhone}`);
+      const result = await response.json();
+      console.log("Hasil kirim WA ke Fonnte:", result);
+
+    } else {
+      // Jika statusnya bukan 'paid'/'completed', kita akan tahu apa status yang dikirim
+      console.log(`[INFO] Status transaksi bukan 'paid'/'completed', melainkan: ${paymentStatus}`);
     }
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json({ success: true, received: true }, { status: 200 });
 
   } catch (error) {
+    console.error("Webhook Error:", error);
     return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }
