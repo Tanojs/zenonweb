@@ -10,13 +10,13 @@ export async function POST(request: Request) {
   try {
     const { price, quantity, whatsappNumber, product } = await request.json();
 
-    // Menggunakan crypto.randomUUID() untuk membuat ID unik secara otomatis
     const orderId = crypto.randomUUID();
 
+    // 1. Masukkan ke Supabase
     const { error } = await supabase
       .from('orders')
       .insert([{ 
-        id: orderId, // Wajib diisi karena id adalah Primary Key
+        id: orderId, 
         customer_name: "Guest", 
         customer_phone: whatsappNumber,
         product_name: product.name,
@@ -25,18 +25,26 @@ export async function POST(request: Request) {
         status: 'pending' 
       }]);
 
-    if (error) {
-      console.error("Supabase Error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    if (error) throw error;
 
-    // Lanjut ke API Pakasir
-    // ... sisa kode tetap sama
-    return NextResponse.json({ success: true, order_id: orderId });
+    // 2. Minta QRIS ke Pakasir
+    const res = await fetch("https://api.pakasir.com/v1/create-qr", {
+      method: "POST",
+      headers: { 
+        "Authorization": `Bearer ${process.env.PAKASIR_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ 
+        amount: price * quantity, 
+        order_id: orderId 
+      })
+    });
 
-    } catch (err: any) {
-    console.error("DEBUG ERROR:", err); // Ini akan muncul di log Vercel
-    return NextResponse.json({ error: err.message || "Terjadi kesalahan" }, { status: 500 });
+    const pData = await res.json();
+    return NextResponse.json({ success: true, qrString: pData.qr_string, order_id: orderId });
+
+  } catch (err: any) {
+    console.error("DEBUG ERROR:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
-
 }
