@@ -20,7 +20,7 @@ function CheckoutContent() {
   const productId = parseInt(searchParams.get("id") || "0");
   const product = ALL_PRODUCTS.find((p) => p.id === productId);
 
-  // Monitor status pembayaran di Supabase
+  // Auto-Redirect ke halaman success
   useEffect(() => {
     if (!orderId) return;
     const interval = setInterval(async () => {
@@ -38,7 +38,12 @@ function CheckoutContent() {
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ price: product.price, quantity, whatsappNumber: wa })
+      body: JSON.stringify({ 
+        price: product.price, 
+        quantity, 
+        whatsappNumber: wa, 
+        product: product 
+      })
     });
     const data = await res.json();
     if (data.success) {
@@ -50,7 +55,6 @@ function CheckoutContent() {
     setLoading(false);
   };
 
-  // Tampilan QRIS
   if (qrString) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -65,32 +69,19 @@ function CheckoutContent() {
     );
   }
 
-  // Tampilan Form (Mengembalikan tampilan yang hilang)
   return (
     <div className="min-h-screen bg-gray-100 p-4 font-sans text-gray-800">
       <div className="max-w-md mx-auto bg-white p-6 rounded-[2rem] shadow-sm">
         <h2 className="font-bold text-xl mb-6">🛒 Detail Pesanan</h2>
-        
         <div className="border border-gray-100 p-4 rounded-2xl mb-6">
           <p className="font-bold text-lg">{product.name}</p>
-          <p className="text-sm text-gray-500 mb-4">PRO TEAM PLAN</p>
           <div className="flex justify-between font-bold text-purple-600">
             <span>HARGA</span>
             <span>Rp {product.price.toLocaleString()}</span>
           </div>
         </div>
-
-        <label className="text-sm font-bold mb-2 block">JUMLAH BELI</label>
-        <div className="flex items-center border-2 border-gray-100 rounded-xl mb-6">
-          <button onClick={() => setQuantity(q => Math.max(1, q-1))} className="px-6 py-3 font-bold">-</button>
-          <input type="number" value={quantity} className="flex-1 text-center font-bold outline-none" readOnly />
-          <button onClick={() => setQuantity(q => q+1)} className="px-6 py-3 font-bold">+</button>
-        </div>
-
-        <label className="text-sm font-bold mb-2 block">NOMOR WHATSAPP</label>
-        <input type="text" placeholder="812xxxx" value={wa} onChange={(e) => setWa(e.target.value)} className="w-full p-4 border-2 border-gray-100 rounded-xl mb-6 outline-none" />
-
-        <button onClick={handleActionBayar} disabled={loading} className="w-full py-4 rounded-2xl bg-purple-600 text-white font-bold text-lg">
+        <input type="text" placeholder="Nomor WhatsApp" value={wa} onChange={(e) => setWa(e.target.value)} className="w-full p-4 border rounded-xl mb-6" />
+        <button onClick={handleActionBayar} disabled={loading} className="w-full py-4 rounded-2xl bg-purple-600 text-white font-bold">
           {loading ? "..." : "BELI →"}
         </button>
       </div>
