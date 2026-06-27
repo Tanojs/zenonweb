@@ -1,48 +1,48 @@
 "use client";
-
-import { useState, useEffect, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { createClient } from '@supabase/supabase-js';
 
-// 1. Komponen yang berisi logika halaman
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
 function SuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order_id");
-  const [status, setStatus] = useState("Memeriksa pembayaran...");
+  const [order, setOrder] = useState<any>(null);
 
   useEffect(() => {
-    if (orderId) {
-      // Logika cek status pembayaran ke API
-      fetch(`/api/check-payment?order_id=${orderId}`)
-        .then(res => res.json())
-        .then(data => {
-          setStatus(data.status === "paid" ? "success" : "pending");
-        });
+    async function fetchOrder() {
+      if (!orderId) return;
+      
+      const { data } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single();
+
+      if (data) setOrder(data);
     }
+    fetchOrder();
   }, [orderId]);
 
   return (
     <div className="p-8 text-center">
-      {status === "success" ? (
+      {order?.status === 'paid' ? (
         <div className="bg-green-100 p-6 rounded-2xl">
           <h1 className="text-2xl font-bold text-green-700">Pembayaran Berhasil!</h1>
-          <p className="mt-4">Ini detail akun/file Anda:</p>
+          <p className="mt-4">Ini detail akun Anda:</p>
           <div className="mt-4 bg-white p-4 rounded-xl border font-mono">
-            Username: akun_pro_123 <br/>
-            Password: rahasia_banget
+            {/* Pastikan kamu sudah punya kolom 'account_data' di tabel orders */}
+            {order.account_data || "Data belum tersedia"}
           </div>
         </div>
       ) : (
-        <p>Sedang memproses pembayaran... harap tunggu.</p>
+        <p>Sedang memproses pembayaran... silakan tunggu atau refresh halaman.</p>
       )}
     </div>
   );
 }
 
-// 2. Bungkus dengan Suspense agar tidak error saat build
 export default function SuccessPage() {
-  return (
-    <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
-      <SuccessContent />
-    </Suspense>
-  );
+  return <Suspense fallback={<div>Loading...</div>}><SuccessContent /></Suspense>;
 }
