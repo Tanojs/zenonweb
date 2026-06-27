@@ -1,17 +1,25 @@
 "use client";
+
 import { useState, Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { QRCodeSVG } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const productId = parseInt(searchParams.get("id") || "0");
+
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const [customerName, setCustomerName] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [qrString, setQrString] = useState("");
@@ -31,10 +39,12 @@ function CheckoutContent() {
   }, [orderId]);
 
   const handleCheckout = async () => {
+    if (!customerName || !whatsappNumber) return alert("Isi data dulu!");
     setLoading(true);
     const res = await fetch("/api/checkout", {
       method: "POST",
-      body: JSON.stringify({ quantity: 1, whatsappNumber, customerName, product })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quantity, whatsappNumber, customerName, product: { id: product.id, name: product.name, type: product.type } })
     });
     const data = await res.json();
     if (data.success) { setQrString(data.qrString); setOrderId(data.order_id); }
@@ -42,19 +52,43 @@ function CheckoutContent() {
     setLoading(false);
   };
 
-  if (!product) return <div className="p-10 text-center">Memuat...</div>;
-  if (qrString) return <div className="flex flex-col items-center p-10"><h2 className="mb-4">Scan QRIS</h2><QRCodeSVG value={qrString} size={200} /><p>Menunggu pembayaran...</p></div>;
+  if (!product) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+
+  if (qrString) return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="bg-white p-8 rounded-3xl shadow-xl text-center w-full max-w-sm">
+        <h2 className="font-bold text-xl mb-4">Scan QRIS</h2>
+        <div className="border-2 border-dashed border-gray-300 p-4 rounded-2xl mb-4">
+          <QRCodeSVG value={qrString} size={220} className="mx-auto" />
+        </div>
+        <p>Menunggu pembayaran...</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h1 className="font-bold text-xl mb-4">{product.name}</h1>
-      <input className="w-full border p-2 mb-2" placeholder="Nama Lengkap" onChange={e => setCustomerName(e.target.value)} />
-      <input className="w-full border p-2 mb-2" placeholder="Nomor WhatsApp" onChange={e => setWhatsappNumber(e.target.value)} />
-      <button onClick={handleCheckout} className="w-full bg-purple-600 text-white p-3 rounded" disabled={loading}>
-        {loading ? "Memproses..." : "Bayar Sekarang"}
-      </button>
+    <div className="min-h-screen bg-gray-100 py-6 px-4">
+      <div className="max-w-md mx-auto bg-white rounded-3xl shadow-lg p-6">
+        <h1 className="text-xl font-bold mb-6">🛒 Detail Pesanan</h1>
+        <div className="mb-4">
+          <p className="font-bold text-lg">{product.name}</p>
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold text-gray-600">NAMA PEMBELI</label>
+          <input className="w-full p-3 border rounded-xl" placeholder="Nama lengkap" onChange={e => setCustomerName(e.target.value)} />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold text-gray-600">NOMOR WHATSAPP</label>
+          <input className="w-full p-3 border rounded-xl" placeholder="+62 812..." onChange={e => setWhatsappNumber(e.target.value)} />
+        </div>
+        <button onClick={handleCheckout} className="w-full bg-purple-600 text-white font-bold py-3 rounded-xl" disabled={loading}>
+          {loading ? "Memproses..." : "BELI SEKARANG →"}
+        </button>
+      </div>
     </div>
   );
 }
 
-export default function Page() { return <Suspense fallback={<div>Loading...</div>}><CheckoutContent /></Suspense>; }
+export default function Page() {
+  return <Suspense fallback={<div>Loading...</div>}><CheckoutContent /></Suspense>;
+}
