@@ -1,36 +1,34 @@
 import { NextResponse } from "next/server";
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
 export async function POST(request: Request) {
-  try {
-    // Menangkap data dari frontend
-    const { price, quantity, whatsappNumber } = await request.json();
-    const orderId = `TANO-${Date.now()}`;
+  const { price, quantity, whatsappNumber } = await request.json();
 
-    const response = await fetch("https://app.pakasir.com/api/transactioncreate/qris", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        project: process.env.PAKASIR_PROJECT,
-        order_id: orderId,
-        amount: price * quantity,
-        api_key: process.env.PAKASIR_API_KEY
-      }),
-    });
+  // 1. Simpan dulu ke Supabase agar punya ID
+  const { data: order, error } = await supabase
+    .from('orders')
+    .insert([{ 
+      status: 'pending', 
+      price: price * quantity,
+      whatsapp: whatsappNumber 
+    }])
+    .select()
+    .single();
 
-    const resData = await response.json();
-    
-    // Validasi respons API Pakasir (C.2)
-    if (!response.ok || !resData.payment?.payment_number) {
-      console.error("Pakasir API Error:", resData);
-      return NextResponse.json({ error: "Gagal generate QR dari server" }, { status: 400 });
-    }
+  if (error) return NextResponse.json({ error: "Gagal simpan ke DB" }, { status: 500 });
 
-    return NextResponse.json({ 
-      success: true, 
-      qrString: resData.payment.payment_number 
-    });
+  // 2. Minta QRIS ke Pakasir (gunakan order.id dari Supabase sebagai referensi)
+  const res = await fetch("https://api.pakasir.com/v1/create-qr", {
+    method: "POST",
+    headers: { "Authorization": "Bearer TOKEN_PAKASIR_KAMU" },
+    body: JSON.stringify({ 
+      amount: price * quantity, 
+      order_id: order.id 
+    })
+  });
 
-  } catch (error) {
-    return NextResponse.json({ error: "Terjadi kesalahan server" }, { status: 500 });
-  }
+  const pData = await res.json();
+  return NextResponse.json({ success: true, qrString: pData.qr_string, order_id: order.id });
 }
