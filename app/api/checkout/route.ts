@@ -27,30 +27,30 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
-    // 2. Minta QRIS ke Pakasir
-    const res = await fetch("https://api.pakasir.com/v1/create-qr", {
+    // 2. Minta QRIS ke Pakasir (sesuai dokumen)
+    const totalAmount = price * quantity;
+    const res = await fetch("https://app.pakasir.com/api/transactioncreate/qris", {
       method: "POST",
-      headers: { 
-        "Authorization": `Bearer ${process.env.PAKASIR_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ 
-        amount: price * quantity, 
-        order_id: orderId 
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        project: process.env.PAKASIR_PROJECT,
+        order_id: orderId,
+        amount: totalAmount,
+        api_key: process.env.PAKASIR_API_KEY
       })
     });
 
     const pData = await res.json();
 
-    // ⚠️ VALIDASI RESPONSE PAKASIR
-    if (!pData.success || !pData.qr_string) {
-      console.error("❌ Pakasir response error:", pData);
-      throw new Error(pData.message || "Gagal membuat QRIS dari Pakasir");
+    // Validasi response
+    if (!pData.payment || !pData.payment.payment_number) {
+      console.error("❌ Pakasir error response:", pData);
+      throw new Error(pData.message || "Gagal membuat QRIS");
     }
 
     return NextResponse.json({ 
       success: true, 
-      qrString: pData.qr_string, 
+      qrString: pData.payment.payment_number, // ← ini QR string-nya
       order_id: orderId 
     });
 
