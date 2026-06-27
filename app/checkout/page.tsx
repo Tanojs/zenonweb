@@ -4,13 +4,14 @@ import { useState, Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { QRCodeSVG } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Interface untuk produk dari database
 interface Product {
   id: number;
   name: string;
@@ -19,22 +20,30 @@ interface Product {
   stock: number;
   is_ready: boolean;
   features: string[];
+  description?: string;
+  delivery_info?: string;
 }
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [qrString, setQrString] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [quantity, setQuantity] = useState<number>(1);
-  const [wa, setWa] = useState<string>("");
-  const [orderId, setOrderId] = useState<string | null>(null);
+  const productId = parseInt(searchParams.get("id") || "0");
+
+  // State untuk produk
   const [product, setProduct] = useState<Product | null>(null);
   const [loadingProduct, setLoadingProduct] = useState(true);
 
-  const productId = parseInt(searchParams.get("id") || "0");
+  // State form
+  const [quantity, setQuantity] = useState<number>(1);
+  const [customerName, setCustomerName] = useState<string>("");
+  const [whatsappNumber, setWhatsappNumber] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Ambil data produk dari Supabase berdasarkan ID
+  // State QR
+  const [qrString, setQrString] = useState<string>("");
+  const [orderId, setOrderId] = useState<string | null>(null);
+
+  // Ambil data produk dari Supabase
   useEffect(() => {
     async function fetchProduct() {
       if (!productId) {
@@ -53,6 +62,8 @@ function CheckoutContent() {
         setProduct(null);
       } else {
         setProduct(data);
+        // Reset quantity kalau stok berubah
+        setQuantity(Math.min(1, data.stock));
       }
       setLoadingProduct(false);
     }
@@ -60,56 +71,42 @@ function CheckoutContent() {
     fetchProduct();
   }, [productId]);
 
-  // Auto-Redirect ke halaman success jika status paid
+  // Polling status order (redirect ke success jika paid)
   useEffect(() => {
     if (!orderId) return;
+
     const interval = setInterval(async () => {
       const { data } = await supabase
         .from('orders')
         .select('status')
         .eq('id', orderId)
         .single();
+
       if (data?.status === 'paid') {
         router.push(`/success?order_id=${orderId}`);
       }
     }, 3000);
+
     return () => clearInterval(interval);
   }, [orderId, router]);
 
-  // Loading state
-  if (loadingProduct) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="text-center">Memuat produk...</div>
-      </div>
-    );
-  }
-
-  if (!product) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-3xl shadow-xl text-center">
-          <h2 className="font-bold text-xl text-red-600">Produk tidak ditemukan</h2>
-          <p className="text-gray-500 mt-2">ID: {productId}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Cek stok
-  const isOutOfStock = product.stock <= 0;
-
-  const handleActionBayar = async () => {
-    if (!wa) {
+  // Handle submit pembayaran
+  const handleCheckout = async () => {
+    // Validasi
+    if (!customerName.trim()) {
+      alert("Masukkan nama lengkap!");
+      return;
+    }
+    if (!whatsappNumber.trim()) {
       alert("Masukkan nomor WhatsApp!");
       return;
     }
-    if (isOutOfStock) {
-      alert("Maaf, stok produk ini habis!");
+    if (quantity < 1) {
+      alert("Minimal beli 1!");
       return;
     }
-    if (quantity < 1) {
-      alert("Quantity minimal 1");
+    if (!product) {
+      alert("Produk tidak ditemukan!");
       return;
     }
     if (quantity > product.stock) {
@@ -118,14 +115,16 @@ function CheckoutContent() {
     }
 
     setLoading(true);
+
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           price: product.price,
-          quantity,
-          whatsappNumber: wa,
+          quantity: quantity,
+          whatsappNumber: whatsappNumber,
+          customerName: customerName,
           product: {
             id: product.id,
             name: product.name,
@@ -149,98 +148,176 @@ function CheckoutContent() {
     }
   };
 
-  // Tampilan QR Code
-  if (qrString) {
+  // Loading produk
+  if (loadingProduct) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-3xl shadow-xl text-center w-full max-w-sm">
-          <h2 className="font-bold text-xl mb-6">Scan QRIS</h2>
-          <div className="border-2 border-dashed p-4 rounded-2xl mb-6">
-            <QRCodeSVG value={qrString} size={220} className="mx-auto" />
-          </div>
-          <p className="text-sm text-gray-600">Menunggu pembayaran...</p>
-          <p className="text-xs text-gray-400 mt-2">Total: Rp {product.price * quantity}</p>
+        <div className="text-center text-gray-600">Memuat produk...</div>
+      </div>
+    );
+  }
+
+  // Produk tidak ditemukan
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-3xl shadow-xl text-center max-w-sm w-full">
+          <h2 className="font-bold text-xl text-red-600">Produk tidak ditemukan</h2>
+          <p className="text-gray-500 text-sm mt-2">ID: {productId}</p>
+          <Link href="/" className="mt-4 inline-block text-purple-600 font-bold text-sm">
+            ← Kembali ke Home
+          </Link>
         </div>
       </div>
     );
   }
 
-  // Tampilan form checkout
+  // Jika stok habis
+  const isOutOfStock = product.stock <= 0;
+
+  // Jika QR sudah muncul (tampilkan QR)
+  if (qrString) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-3xl shadow-xl text-center w-full max-w-sm">
+          <h2 className="font-bold text-xl mb-4">Scan QRIS</h2>
+          <div className="border-2 border-dashed border-gray-300 p-4 rounded-2xl mb-4">
+            <QRCodeSVG value={qrString} size={220} className="mx-auto" />
+          </div>
+          <p className="text-sm text-gray-600">Menunggu pembayaran...</p>
+          <p className="text-xs text-gray-400 mt-2">
+            Total: Rp {(product.price * quantity).toLocaleString()}
+          </p>
+          <button
+            onClick={() => router.push("/")}
+            className="mt-6 text-purple-600 font-bold text-sm"
+          >
+            ← Kembali ke Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Tampilan form checkout (sesuai screenshot)
   return (
-    <div className="min-h-screen bg-gray-100 p-4 font-sans text-gray-800">
-      <div className="max-w-md mx-auto bg-white p-6 rounded-[2rem] shadow-sm">
-        <h2 className="font-bold text-xl mb-6">🛒 Detail Pesanan</h2>
+    <div className="min-h-screen bg-gray-100 py-6 px-4">
+      <div className="max-w-md mx-auto">
 
-        <div className="border border-gray-100 p-4 rounded-2xl mb-6">
-          <p className="font-bold text-lg">{product.name}</p>
-          <div className="flex justify-between font-bold text-purple-600 mt-1">
-            <span>Harga</span>
-            <span>Rp {product.price.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between text-sm text-gray-500 mt-1">
-            <span>Stok tersedia</span>
-            <span>{product.stock}</span>
-          </div>
-        </div>
+        {/* Tombol kembali */}
+        <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-4 text-sm font-semibold">
+          <ArrowLeft className="w-4 h-4" /> Kembali
+        </Link>
 
-        {/* Input Quantity */}
-        <div className="mb-4">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Jumlah</label>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 text-xl font-bold flex items-center justify-center"
-              disabled={quantity <= 1}
+        {/* Card utama */}
+        <div className="bg-white rounded-3xl shadow-lg p-6">
+
+          {/* Header */}
+          <h1 className="text-xl font-bold text-gray-800 mb-6">🛒 Detail Pesanan</h1>
+
+          {/* Item dipilih */}
+          <div className="border border-gray-200 rounded-2xl p-4 mb-6">
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Item Dipilih</p>
+            <p className="font-bold text-lg text-gray-800">{product.name}</p>
+            <p className="text-sm text-gray-600 mt-1">{product.features?.join(", ") || "Produk digital"}</p>
+          </div>
+
+          {/* Harga satuan */}
+          <div className="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
+            <span className="text-sm font-semibold text-gray-600">HARGA SATUAN</span>
+            <span className="font-bold text-gray-800">Rp {product.price.toLocaleString()}</span>
+          </div>
+
+          {/* Jumlah beli */}
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
+            <span className="text-sm font-semibold text-gray-600">JUMLAH BELI</span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                disabled={quantity <= 1 || isOutOfStock}
+                className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 text-xl font-bold flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                -
+              </button>
+              <span className="text-xl font-bold w-8 text-center">{quantity}</span>
+              <button
+                onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                disabled={quantity >= product.stock || isOutOfStock}
+                className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 text-xl font-bold flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          {/* Metode pembayaran */}
+          <div className="bg-purple-50 rounded-2xl p-4 mb-6">
+            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Metode Pembayaran</p>
+            <p className="font-bold text-purple-700">QRIS (Otomatis)</p>
+            <p className="text-xs text-gray-500 mt-1">Scan via DANA, GoPay, OVO, ShopeePay, dll.</p>
+          </div>
+
+          {/* Nama pembeli */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-600 mb-1">NAMA PEMBELI</label>
+            <input
+              type="text"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="Masukkan nama lengkap"
+              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm"
+            />
+          </div>
+
+          {/* Nomor WhatsApp */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-600 mb-1">NOMOR WHATSAPP AKTIF</label>
+            <input
+              type="tel"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              placeholder="+62 812xxxxxxxx"
+              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm"
+            />
+          </div>
+
+          {/* Total bayar */}
+          <div className="flex justify-between items-center border-t border-gray-200 pt-4 mb-6">
+            <span className="text-sm font-bold text-gray-600">TOTAL BAYAR</span>
+            <span className="text-2xl font-bold text-purple-700">
+              Rp {(product.price * quantity).toLocaleString()}
+            </span>
+          </div>
+
+          {/* Stok warning */}
+          {isOutOfStock && (
+            <div className="bg-red-50 p-3 rounded-xl mb-4 border border-red-200">
+              <p className="text-red-600 text-sm font-bold text-center">⚠️ Stok produk ini habis!</p>
+            </div>
+          )}
+
+          {/* Tombol aksi */}
+          <div className="flex gap-3">
+            <Link
+              href="/"
+              className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-600 font-bold text-center hover:bg-gray-50 transition"
             >
-              -
-            </button>
-            <span className="text-xl font-bold w-12 text-center">{quantity}</span>
+              BATAL
+            </Link>
             <button
-              onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-              className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 text-xl font-bold flex items-center justify-center"
-              disabled={quantity >= product.stock}
+              onClick={handleCheckout}
+              disabled={loading || isOutOfStock}
+              className={`flex-1 py-3 rounded-xl text-white font-bold transition-all ${
+                isOutOfStock
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 active:scale-95"
+              }`}
             >
-              +
+              {loading ? "Memproses..." : isOutOfStock ? "STOK HABIS" : "BELI SEKARANG"}
             </button>
-            <span className="text-sm text-gray-500 ml-2">Max {product.stock}</span>
           </div>
+
         </div>
-
-        {/* Input WhatsApp */}
-        <input
-          type="text"
-          placeholder="Nomor WhatsApp (contoh: 08123456789)"
-          value={wa}
-          onChange={(e) => setWa(e.target.value)}
-          className="w-full p-4 border rounded-xl mb-6 focus:outline-none focus:ring-2 focus:ring-purple-600"
-        />
-
-        {/* Total */}
-        <div className="flex justify-between font-bold text-lg mb-6 border-t pt-4">
-          <span>Total</span>
-          <span className="text-purple-600">Rp {(product.price * quantity).toLocaleString()}</span>
-        </div>
-
-        {/* Tombol Beli */}
-        <button
-          onClick={handleActionBayar}
-          disabled={loading || isOutOfStock}
-          className={`w-full py-4 rounded-2xl text-white font-bold transition-all ${
-            isOutOfStock
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-purple-600 hover:bg-purple-700 active:scale-95"
-          }`}
-        >
-          {loading
-            ? "Memproses..."
-            : isOutOfStock
-            ? "STOK HABIS"
-            : `BAYAR Rp ${(product.price * quantity).toLocaleString()} →`}
-        </button>
-
-        {isOutOfStock && (
-          <p className="text-red-500 text-sm text-center mt-3">Maaf, stok produk ini habis.</p>
-        )}
       </div>
     </div>
   );
