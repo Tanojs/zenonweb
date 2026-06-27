@@ -1,83 +1,78 @@
-import { NextResponse } from "next/server";
+"use client";
+
+import { useState, Suspense, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { QRCodeSVG } from 'qrcode.react';
 import { createClient } from '@supabase/supabase-js';
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!, 
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export async function POST(request: Request) {
-  try {
-    const { quantity, whatsappNumber, customerName, product } = await request.json();
+function CheckoutContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const productId = parseInt(searchParams.get("id") || "0");
 
-    if (!whatsappNumber || !customerName) {
-      return NextResponse.json({ error: "Nama dan WhatsApp wajib diisi" }, { status: 400 });
-    }
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [customerName, setCustomerName] = useState("");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [qrString, setQrString] = useState("");
+  const [orderId, setOrderId] = useState<string | null>(null);
 
-    // 1. CEK STOK DAN DATA PRODUK
-    const { data: productData, error: productError } = await supabase
-      .from('products')
-      .select('stock, name, price, delivery_info')
-      .eq('id', product.id)
-      .single();
+  useEffect(() => {
+    supabase.from('products').select('*').eq('id', productId).single().then(({data}) => setProduct(data));
+  }, [productId]);
 
-    if (productError || !productData) {
-      return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
-    }
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          quantity, whatsappNumber, customerName,
+          product: { id: product.id, name: product.name, type: product.type }
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setQrString(data.qrString);
+        setOrderId(data.order_id);
+      } else {
+        alert(data.error);
+      }
+    } catch (err) { alert("Gagal"); }
+    finally { setLoading(false); }
+  };
 
-    if (productData.stock < quantity) {
-      return NextResponse.json({ error: "Stok tidak cukup" }, { status: 400 });
-    }
+  if (!product) return <div className="p-10 text-center">Loading...</div>;
 
-    const totalAmount = productData.price * quantity;
-    const orderId = crypto.randomUUID();
+  if (qrString) return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <h2 className="font-bold text-xl mb-4">Scan QRIS</h2>
+      <QRCodeSVG value={qrString} size={220} />
+      <p className="mt-4">Menunggu pembayaran...</p>
+    </div>
+  );
 
-    // 2. INSERT ORDER (Menyertakan product_type dan account_data dari delivery_info)
-    const { error: insertError } = await supabase
-      .from('orders')
-      .insert([{ 
-        id: orderId,
-        customer_name: customerName,
-        customer_phone: whatsappNumber,
-        product_id: product.id,
-        product_name: productData.name,
-        product_type: product.type,
-        product_price: totalAmount,
-        quantity: quantity,
-        status: 'pending',
-        account_data: productData.delivery_info // Data otomatis masuk ke sini
-      }]);
+  return (
+    <div className="max-w-md mx-auto p-6">
+      <h1 className="text-xl font-bold mb-4">{product.name}</h1>
+      <input className="w-full border p-2 mb-2" placeholder="Nama" onChange={e => setCustomerName(e.target.value)} />
+      <input className="w-full border p-2 mb-2" placeholder="WhatsApp" onChange={e => setWhatsappNumber(e.target.value)} />
+      <button onClick={handleCheckout} className="w-full bg-purple-600 text-white p-3 rounded-lg" disabled={loading}>
+        {loading ? "Memproses..." : "Bayar Sekarang"}
+      </button>
+    </div>
+  );
+}
 
-    if (insertError) {
-      console.error("Gagal insert:", insertError);
-      throw new Error("Gagal menyimpan order");
-    }
-
-    // 3. MINTA QRIS KE PAKASIR
-    const res = await fetch("https://app.pakasir.com/api/transactioncreate/qris", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        project: process.env.PAKASIR_PROJECT,
-        order_id: orderId,
-        amount: totalAmount,
-        api_key: process.env.PAKASIR_API_KEY
-      })
-    });
-
-    const pData = await res.json();
-
-    if (!pData.payment || !pData.payment.payment_number) {
-      throw new Error("Gagal membuat QRIS");
-    }
-
-    return NextResponse.json({ 
-      success: true,
-      qrString: pData.payment.payment_number,
-      order_id: orderId
-    });
-
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
+export default function Page() {
+  return <Suspense fallback={<div>Loading...</div>}><CheckoutContent /></Suspense>;
 }
