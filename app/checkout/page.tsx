@@ -23,19 +23,6 @@ interface Product {
   delivery_info?: string;
 }
 
-const countryCodes = [
-  { code: "+62", label: "🇮🇩 Indonesia" },
-  { code: "+60", label: "🇲🇾 Malaysia" },
-  { code: "+65", label: "🇸🇬 Singapura" },
-  { code: "+63", label: "🇵🇭 Filipina" },
-  { code: "+66", label: "🇹🇭 Thailand" },
-  { code: "+84", label: "🇻🇳 Vietnam" },
-  { code: "+91", label: "🇮🇳 India" },
-  { code: "+1", label: "🇺🇸 USA" },
-  { code: "+44", label: "🇬🇧 UK" },
-  { code: "+81", label: "🇯🇵 Jepang" },
-];
-
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -45,7 +32,6 @@ function CheckoutContent() {
   const [loadingProduct, setLoadingProduct] = useState(true);
   const [quantity, setQuantity] = useState<number>(1);
   const [customerName, setCustomerName] = useState<string>("");
-  const [countryCode, setCountryCode] = useState<string>("+62");
   const [whatsappNumber, setWhatsappNumber] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [qrString, setQrString] = useState<string>("");
@@ -123,15 +109,13 @@ function CheckoutContent() {
     setLoading(true);
 
     try {
-      const fullPhoneNumber = countryCode + whatsappNumber;
-
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           price: product.price,
           quantity: quantity,
-          whatsappNumber: fullPhoneNumber,
+          whatsappNumber: whatsappNumber, // Langsung kirim string (sudah include +62)
           customerName: customerName,
           product: {
             id: product.id,
@@ -214,7 +198,7 @@ function CheckoutContent() {
           <h1 className="text-xl font-bold text-gray-800 mb-6">🛒 Detail Pesanan</h1>
 
           <div className="border border-gray-200 rounded-2xl p-4 mb-6">
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Item Dipilih</p>
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">ITEM DIPILIH</p>
             <p className="font-bold text-lg text-gray-800">{product.name}</p>
             <p className="text-sm text-gray-600 mt-1">{product.features?.join(", ") || "Produk digital"}</p>
           </div>
@@ -246,7 +230,7 @@ function CheckoutContent() {
           </div>
 
           <div className="bg-purple-50 rounded-2xl p-4 mb-6">
-            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Metode Pembayaran</p>
+            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">METODE PEMBAYARAN</p>
             <p className="font-bold text-purple-700">QRIS (Otomatis)</p>
             <p className="text-xs text-gray-500 mt-1">Scan via DANA, GoPay, OVO, ShopeePay, dll.</p>
           </div>
@@ -264,25 +248,13 @@ function CheckoutContent() {
 
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-600 mb-1">NOMOR WHATSAPP AKTIF</label>
-            <div className="flex gap-2">
-              <select
-                value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value)}
-                className="w-28 p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm bg-white"
-              >
-                {countryCodes.map((c) => (
-                  <option key={c.code} value={c.code}>{c.label}</option>
-                ))}
-              </select>
-              <input
-                type="tel"
-                value={whatsappNumber}
-                onChange={(e) => setWhatsappNumber(e.target.value)}
-                placeholder="812xxxxxxxx"
-                className="flex-1 p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm"
-              />
-            </div>
-            <p className="text-xs text-gray-400 mt-1">Contoh: 81234567890 (tanpa 0 di depan)</p>
+            <input
+              type="tel"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              placeholder="+62 812xxxxxxxx"
+              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm"
+            />
           </div>
 
           <div className="flex justify-between items-center border-t border-gray-200 pt-4 mb-6">
