@@ -8,61 +8,50 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { price, quantity, whatsappNumber, customerName, product } = await request.json();
+    const { quantity, whatsappNumber, customerName, product } = await request.json();
 
-    // Validasi input
-    if (!whatsappNumber) {
-      return NextResponse.json({ error: "Nomor WhatsApp wajib diisi" }, { status: 400 });
-    }
-    if (!product || !product.id) {
-      return NextResponse.json({ error: "Produk tidak valid" }, { status: 400 });
-    }
-    if (quantity < 1) {
-      return NextResponse.json({ error: "Minimal beli 1" }, { status: 400 });
+    if (!whatsappNumber || !customerName) {
+      return NextResponse.json({ error: "Nama dan WhatsApp wajib diisi" }, { status: 400 });
     }
 
-    // 1. CEK STOK PRODUK
+    // 1. CEK STOK DAN DATA PRODUK
     const { data: productData, error: productError } = await supabase
       .from('products')
-      .select('stock, name, price')
+      .select('stock, name, price, delivery_info')
       .eq('id', product.id)
       .single();
 
     if (productError || !productData) {
-      console.error("Produk tidak ditemukan:", productError);
       return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
     }
 
     if (productData.stock < quantity) {
-      return NextResponse.json({ 
-        error: `Stok tidak cukup. Sisa: ${productData.stock}` 
-      }, { status: 400 });
+      return NextResponse.json({ error: "Stok tidak cukup" }, { status: 400 });
     }
 
     const totalAmount = productData.price * quantity;
     const orderId = crypto.randomUUID();
 
-    // 2. INSERT ORDER
+    // 2. INSERT ORDER (Menyertakan product_type dan account_data dari delivery_info)
     const { error: insertError } = await supabase
       .from('orders')
       .insert([{ 
         id: orderId,
-        customer_name: customerName || "Guest",
+        customer_name: customerName,
         customer_phone: whatsappNumber,
-        product_name: productData.name,
-        product_type: product.type || "Default",
-        product_price: totalAmount,
         product_id: product.id,
+        product_name: productData.name,
+        product_type: product.type,
+        product_price: totalAmount,
         quantity: quantity,
-        status: 'pending'
+        status: 'pending',
+        account_data: productData.delivery_info // Data otomatis masuk ke sini
       }]);
 
     if (insertError) {
-      console.error("Gagal insert order:", insertError);
+      console.error("Gagal insert:", insertError);
       throw new Error("Gagal menyimpan order");
     }
-
-    console.log(`Order ${orderId} dibuat, stok sebelum: ${productData.stock}`);
 
     // 3. MINTA QRIS KE PAKASIR
     const res = await fetch("https://app.pakasir.com/api/transactioncreate/qris", {
@@ -79,25 +68,16 @@ export async function POST(request: Request) {
     const pData = await res.json();
 
     if (!pData.payment || !pData.payment.payment_number) {
-      console.error("Pakasir error:", pData);
-      await supabase.from('orders').delete().eq('id', orderId);
-      throw new Error(pData.message || "Gagal membuat QRIS");
+      throw new Error("Gagal membuat QRIS");
     }
-
-    console.log(`QRIS berhasil untuk order ${orderId}`);
 
     return NextResponse.json({ 
       success: true,
       qrString: pData.payment.payment_number,
-      order_id: orderId,
-      total_payment: pData.payment.total_payment || totalAmount,
-      expired_at: pData.payment.expired_at
+      order_id: orderId
     });
 
   } catch (err: any) {
-    console.error("Checkout error:", err);
-    return NextResponse.json({ 
-      error: err.message || "Terjadi kesalahan internal" 
-    }, { status: 500 });
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
