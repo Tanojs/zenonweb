@@ -20,7 +20,6 @@ interface Product {
   stock: number;
   is_ready: boolean;
   features: string[];
-  description?: string;
   delivery_info?: string;
 }
 
@@ -29,21 +28,16 @@ function CheckoutContent() {
   const router = useRouter();
   const productId = parseInt(searchParams.get("id") || "0");
 
-  // State untuk produk
   const [product, setProduct] = useState<Product | null>(null);
   const [loadingProduct, setLoadingProduct] = useState(true);
-
-  // State form
   const [quantity, setQuantity] = useState<number>(1);
   const [customerName, setCustomerName] = useState<string>("");
   const [whatsappNumber, setWhatsappNumber] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-
-  // State QR
   const [qrString, setQrString] = useState<string>("");
   const [orderId, setOrderId] = useState<string | null>(null);
 
-  // Ambil data produk dari Supabase
+  // Ambil produk dari database
   useEffect(() => {
     async function fetchProduct() {
       if (!productId) {
@@ -62,7 +56,6 @@ function CheckoutContent() {
         setProduct(null);
       } else {
         setProduct(data);
-        // Reset quantity kalau stok berubah
         setQuantity(Math.min(1, data.stock));
       }
       setLoadingProduct(false);
@@ -71,7 +64,7 @@ function CheckoutContent() {
     fetchProduct();
   }, [productId]);
 
-  // Polling status order (redirect ke success jika paid)
+  // Polling status order
   useEffect(() => {
     if (!orderId) return;
 
@@ -90,9 +83,8 @@ function CheckoutContent() {
     return () => clearInterval(interval);
   }, [orderId, router]);
 
-  // Handle submit pembayaran
+  // Handle checkout
   const handleCheckout = async () => {
-    // Validasi
     if (!customerName.trim()) {
       alert("Masukkan nama lengkap!");
       return;
@@ -148,7 +140,6 @@ function CheckoutContent() {
     }
   };
 
-  // Loading produk
   if (loadingProduct) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -157,7 +148,6 @@ function CheckoutContent() {
     );
   }
 
-  // Produk tidak ditemukan
   if (!product) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -172,10 +162,8 @@ function CheckoutContent() {
     );
   }
 
-  // Jika stok habis
   const isOutOfStock = product.stock <= 0;
 
-  // Jika QR sudah muncul (tampilkan QR)
   if (qrString) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -199,36 +187,27 @@ function CheckoutContent() {
     );
   }
 
-  // Tampilan form checkout (sesuai screenshot)
   return (
     <div className="min-h-screen bg-gray-100 py-6 px-4">
       <div className="max-w-md mx-auto">
-
-        {/* Tombol kembali */}
         <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-4 text-sm font-semibold">
           <ArrowLeft className="w-4 h-4" /> Kembali
         </Link>
 
-        {/* Card utama */}
         <div className="bg-white rounded-3xl shadow-lg p-6">
-
-          {/* Header */}
           <h1 className="text-xl font-bold text-gray-800 mb-6">🛒 Detail Pesanan</h1>
 
-          {/* Item dipilih */}
           <div className="border border-gray-200 rounded-2xl p-4 mb-6">
             <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Item Dipilih</p>
             <p className="font-bold text-lg text-gray-800">{product.name}</p>
             <p className="text-sm text-gray-600 mt-1">{product.features?.join(", ") || "Produk digital"}</p>
           </div>
 
-          {/* Harga satuan */}
           <div className="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
             <span className="text-sm font-semibold text-gray-600">HARGA SATUAN</span>
             <span className="font-bold text-gray-800">Rp {product.price.toLocaleString()}</span>
           </div>
 
-          {/* Jumlah beli */}
           <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
             <span className="text-sm font-semibold text-gray-600">JUMLAH BELI</span>
             <div className="flex items-center gap-3">
@@ -250,14 +229,12 @@ function CheckoutContent() {
             </div>
           </div>
 
-          {/* Metode pembayaran */}
           <div className="bg-purple-50 rounded-2xl p-4 mb-6">
             <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Metode Pembayaran</p>
             <p className="font-bold text-purple-700">QRIS (Otomatis)</p>
             <p className="text-xs text-gray-500 mt-1">Scan via DANA, GoPay, OVO, ShopeePay, dll.</p>
           </div>
 
-          {/* Nama pembeli */}
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-600 mb-1">NAMA PEMBELI</label>
             <input
@@ -269,7 +246,6 @@ function CheckoutContent() {
             />
           </div>
 
-          {/* Nomor WhatsApp */}
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-600 mb-1">NOMOR WHATSAPP AKTIF</label>
             <input
@@ -281,7 +257,6 @@ function CheckoutContent() {
             />
           </div>
 
-          {/* Total bayar */}
           <div className="flex justify-between items-center border-t border-gray-200 pt-4 mb-6">
             <span className="text-sm font-bold text-gray-600">TOTAL BAYAR</span>
             <span className="text-2xl font-bold text-purple-700">
@@ -289,14 +264,12 @@ function CheckoutContent() {
             </span>
           </div>
 
-          {/* Stok warning */}
           {isOutOfStock && (
             <div className="bg-red-50 p-3 rounded-xl mb-4 border border-red-200">
               <p className="text-red-600 text-sm font-bold text-center">⚠️ Stok produk ini habis!</p>
             </div>
           )}
 
-          {/* Tombol aksi */}
           <div className="flex gap-3">
             <Link
               href="/"
@@ -316,7 +289,6 @@ function CheckoutContent() {
               {loading ? "Memproses..." : isOutOfStock ? "STOK HABIS" : "BELI SEKARANG"}
             </button>
           </div>
-
         </div>
       </div>
     </div>
