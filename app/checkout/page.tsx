@@ -19,7 +19,7 @@ interface Product {
   price: number;
   stock: number;
   is_ready: boolean;
-  features: string[];
+  features: string[]; // Ini yang membuat fitur muncul
   delivery_info?: string;
 }
 
@@ -44,7 +44,9 @@ function CheckoutContent() {
         return;
       }
       const { data, error } = await supabase.from('products').select('*').eq('id', productId).single();
-      if (data) {
+      if (error || !data) {
+        setProduct(null);
+      } else {
         setProduct(data);
         setQuantity(Math.min(1, data.stock));
       }
@@ -63,23 +65,25 @@ function CheckoutContent() {
   }, [orderId, router]);
 
   const handleCheckout = async () => {
-    if (!customerName.trim() || !whatsappNumber.trim()) return alert("Lengkapi data!");
+    if (!customerName.trim() || !whatsappNumber.trim() || !product) {
+      alert("Lengkapi data!"); return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          price: product?.price,
+          price: product.price,
           quantity,
           whatsappNumber,
           customerName,
-          product: { id: product?.id, name: product?.name, type: product?.type }
+          product: { id: product.id, name: product.name, type: product.type }
         })
       });
       const data = await res.json();
       if (data.success) { setQrString(data.qrString); setOrderId(data.order_id); }
-      else alert(data.error || "Gagal memproses");
+      else alert(data.error);
     } catch (err: any) { alert("Error: " + err.message); }
     finally { setLoading(false); }
   };
@@ -93,10 +97,7 @@ function CheckoutContent() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-3xl shadow-xl text-center w-full max-w-sm">
         <h2 className="font-bold text-xl mb-4">Scan QRIS</h2>
-        <div className="border-2 border-dashed border-gray-300 p-4 rounded-2xl mb-4">
-          <QRCodeSVG value={qrString} size={220} className="mx-auto" />
-        </div>
-        <p className="text-sm text-gray-600">Menunggu pembayaran...</p>
+        <QRCodeSVG value={qrString} size={220} className="mx-auto" />
       </div>
     </div>
   );
@@ -110,7 +111,9 @@ function CheckoutContent() {
         <div className="bg-white rounded-3xl shadow-lg p-6">
           <h1 className="text-xl font-bold text-gray-800 mb-6">🛒 Detail Pesanan</h1>
           <div className="border border-gray-200 rounded-2xl p-4 mb-6">
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Item Dipilih</p>
             <p className="font-bold text-lg text-gray-800">{product.name}</p>
+            <p className="text-sm text-gray-600 mt-1">{product.features?.join(", ") || "Produk digital"}</p>
           </div>
 
           <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
@@ -122,15 +125,9 @@ function CheckoutContent() {
             </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-semibold mb-1">NAMA PEMBELI</label>
-            <input className="w-full p-3 border rounded-xl" onChange={e => setCustomerName(e.target.value)} placeholder="Nama lengkap" />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-semibold mb-1">NOMOR WHATSAPP</label>
-            <input className="w-full p-3 border rounded-xl" onChange={e => setWhatsappNumber(e.target.value)} placeholder="+62..." />
-          </div>
-
+          <input className="w-full p-3 border rounded-xl mb-4" placeholder="Nama lengkap" onChange={e => setCustomerName(e.target.value)} />
+          <input className="w-full p-3 border rounded-xl mb-4" placeholder="WhatsApp" onChange={e => setWhatsappNumber(e.target.value)} />
+          
           <button onClick={handleCheckout} className="w-full bg-purple-600 text-white font-bold py-3 rounded-xl">
             {loading ? "Memproses..." : "BELI SEKARANG"}
           </button>
@@ -140,6 +137,4 @@ function CheckoutContent() {
   );
 }
 
-export default function Page() {
-  return <Suspense fallback={<div>Loading...</div>}><CheckoutContent /></Suspense>;
-}
+export default function Page() { return <Suspense fallback={<div>Loading...</div>}><CheckoutContent /></Suspense>; }
