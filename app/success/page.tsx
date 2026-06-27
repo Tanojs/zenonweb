@@ -1,24 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function SuccessPage() {
+// 1. Komponen yang berisi logika halaman
+function SuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order_id");
   const [status, setStatus] = useState("Memeriksa pembayaran...");
 
   useEffect(() => {
-    // Cek ke API internal kita apakah pembayaran sudah masuk
-    fetch(`/api/check-payment?order_id=${orderId}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "paid") {
-          setStatus("success");
-        } else {
-          setStatus("pending");
-        }
-      });
+    if (orderId) {
+      // Logika cek status pembayaran ke API
+      fetch(`/api/check-payment?order_id=${orderId}`)
+        .then(res => res.json())
+        .then(data => {
+          setStatus(data.status === "paid" ? "success" : "pending");
+        });
+    }
   }, [orderId]);
 
   return (
@@ -36,5 +35,14 @@ export default function SuccessPage() {
         <p>Sedang memproses pembayaran... harap tunggu.</p>
       )}
     </div>
+  );
+}
+
+// 2. Bungkus dengan Suspense agar tidak error saat build
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+      <SuccessContent />
+    </Suspense>
   );
 }
