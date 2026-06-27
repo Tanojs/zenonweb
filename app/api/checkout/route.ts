@@ -34,7 +34,9 @@ export async function POST(request: Request) {
     // ... sisa kode tetap sama
     return NextResponse.json({ success: true, order_id: orderId });
 
-  } catch (err) {
-    return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
+    } catch (err: any) {
+    console.error("DEBUG ERROR:", err); // Ini akan muncul di log Vercel
+    return NextResponse.json({ error: err.message || "Terjadi kesalahan" }, { status: 500 });
   }
+
 }
