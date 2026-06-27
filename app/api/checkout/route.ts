@@ -41,7 +41,18 @@ export async function POST(request: Request) {
     });
 
     const pData = await res.json();
-    return NextResponse.json({ success: true, qrString: pData.qr_string, order_id: orderId });
+
+    // ⚠️ VALIDASI RESPONSE PAKASIR
+    if (!pData.success || !pData.qr_string) {
+      console.error("❌ Pakasir response error:", pData);
+      throw new Error(pData.message || "Gagal membuat QRIS dari Pakasir");
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      qrString: pData.qr_string, 
+      order_id: orderId 
+    });
 
   } catch (err: any) {
     console.error("DEBUG ERROR:", err);
