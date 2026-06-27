@@ -10,29 +10,19 @@ export async function POST(request: Request) {
   try {
     const { quantity, whatsappNumber, customerName, product } = await request.json();
 
-    if (!whatsappNumber || !customerName) {
-      return NextResponse.json({ error: "Nama dan WhatsApp wajib diisi" }, { status: 400 });
-    }
-
-    // 1. CEK STOK DAN DATA PRODUK
-    const { data: productData, error: productError } = await supabase
+    const { data: productData } = await supabase
       .from('products')
       .select('stock, name, price, delivery_info')
       .eq('id', product.id)
       .single();
 
-    if (productError || !productData) {
-      return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
-    }
-
-    if (productData.stock < quantity) {
-      return NextResponse.json({ error: "Stok tidak cukup" }, { status: 400 });
+    if (!productData || productData.stock < quantity) {
+      return NextResponse.json({ error: "Produk tidak tersedia/Stok habis" }, { status: 400 });
     }
 
     const totalAmount = productData.price * quantity;
     const orderId = crypto.randomUUID();
 
-    // 2. INSERT ORDER (Menyertakan product_type dan account_data dari delivery_info)
     const { error: insertError } = await supabase
       .from('orders')
       .insert([{ 
@@ -45,15 +35,11 @@ export async function POST(request: Request) {
         product_price: totalAmount,
         quantity: quantity,
         status: 'pending',
-        account_data: productData.delivery_info // Data otomatis masuk ke sini
+        account_data: productData.delivery_info 
       }]);
 
-    if (insertError) {
-      console.error("Gagal insert:", insertError);
-      throw new Error("Gagal menyimpan order");
-    }
+    if (insertError) throw new Error("Gagal simpan order ke database");
 
-    // 3. MINTA QRIS KE PAKASIR
     const res = await fetch("https://app.pakasir.com/api/transactioncreate/qris", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -66,17 +52,9 @@ export async function POST(request: Request) {
     });
 
     const pData = await res.json();
+    if (!pData.payment?.payment_number) throw new Error("Gagal membuat QRIS");
 
-    if (!pData.payment || !pData.payment.payment_number) {
-      throw new Error("Gagal membuat QRIS");
-    }
-
-    return NextResponse.json({ 
-      success: true,
-      qrString: pData.payment.payment_number,
-      order_id: orderId
-    });
-
+    return NextResponse.json({ success: true, qrString: pData.payment.payment_number, order_id: orderId });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
