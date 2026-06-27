@@ -8,7 +8,7 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { price, quantity, whatsappNumber, product } = await request.json();
+    const { price, quantity, whatsappNumber, customerName, product } = await request.json();
 
     // Validasi input
     if (!whatsappNumber) {
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       .from('orders')
       .insert([{ 
         id: orderId,
-        customer_name: "Guest",
+        customer_name: customerName || "Guest",
         customer_phone: whatsappNumber,
         product_name: productData.name,
         product_type: product.type || "Default",
