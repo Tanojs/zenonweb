@@ -37,6 +37,7 @@ function CheckoutContent() {
   const [qrString, setQrString] = useState<string>("");
   const [orderId, setOrderId] = useState<string | null>(null);
 
+  // Ambil produk dari database
   useEffect(() => {
     async function fetchProduct() {
       if (!productId) {
@@ -63,6 +64,7 @@ function CheckoutContent() {
     fetchProduct();
   }, [productId]);
 
+  // Polling status order
   useEffect(() => {
     if (!orderId) return;
 
@@ -81,6 +83,7 @@ function CheckoutContent() {
     return () => clearInterval(interval);
   }, [orderId, router]);
 
+  // Handle checkout
   const handleCheckout = async () => {
     if (!customerName.trim()) {
       alert("Masukkan nama lengkap!");
@@ -195,7 +198,7 @@ function CheckoutContent() {
           <h1 className="text-xl font-bold text-gray-800 mb-6">🛒 Detail Pesanan</h1>
 
           <div className="border border-gray-200 rounded-2xl p-4 mb-6">
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">ITEM DIPILIH</p>
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Item Dipilih</p>
             <p className="font-bold text-lg text-gray-800">{product.name}</p>
             <p className="text-sm text-gray-600 mt-1">{product.features?.join(", ") || "Produk digital"}</p>
           </div>
@@ -227,7 +230,7 @@ function CheckoutContent() {
           </div>
 
           <div className="bg-purple-50 rounded-2xl p-4 mb-6">
-            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">METODE PEMBAYARAN</p>
+            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Metode Pembayaran</p>
             <p className="font-bold text-purple-700">QRIS (Otomatis)</p>
             <p className="text-xs text-gray-500 mt-1">Scan via DANA, GoPay, OVO, ShopeePay, dll.</p>
           </div>
@@ -249,7 +252,7 @@ function CheckoutContent() {
               type="tel"
               value={whatsappNumber}
               onChange={(e) => setWhatsappNumber(e.target.value)}
-              placeholder="62812xxxxxx"
+              placeholder="+62 812xxxxxxxx"
               className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm"
             />
           </div>
