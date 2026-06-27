@@ -37,7 +37,6 @@ function CheckoutContent() {
   const [qrString, setQrString] = useState<string>("");
   const [orderId, setOrderId] = useState<string | null>(null);
 
-  // Ambil produk dari database
   useEffect(() => {
     async function fetchProduct() {
       if (!productId) {
@@ -64,7 +63,6 @@ function CheckoutContent() {
     fetchProduct();
   }, [productId]);
 
-  // Polling status order
   useEffect(() => {
     if (!orderId) return;
 
@@ -83,7 +81,6 @@ function CheckoutContent() {
     return () => clearInterval(interval);
   }, [orderId, router]);
 
-  // Handle checkout
   const handleCheckout = async () => {
     if (!customerName.trim()) {
       alert("Masukkan nama lengkap!");
@@ -115,7 +112,7 @@ function CheckoutContent() {
         body: JSON.stringify({
           price: product.price,
           quantity: quantity,
-          whatsappNumber: whatsappNumber, // Langsung kirim string (sudah include +62)
+          whatsappNumber: whatsappNumber,
           customerName: customerName,
           product: {
             id: product.id,
@@ -248,13 +245,17 @@ function CheckoutContent() {
 
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-600 mb-1">NOMOR WHATSAPP AKTIF</label>
-            <input
-              type="tel"
-              value={whatsappNumber}
-              onChange={(e) => setWhatsappNumber(e.target.value)}
-              placeholder="+62 812xxxxxxxx"
-              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm"
-            />
+            <div className="flex items-center border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-purple-600 overflow-hidden">
+              <span className="bg-gray-100 px-3 py-3 text-gray-600 font-bold text-sm border-r border-gray-200">+</span>
+              <input
+                type="tel"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                placeholder="62812xxxxxxxx"
+                className="flex-1 p-3 focus:outline-none text-sm"
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-1">Contoh: 62812xxxxxxxx (kode negara + nomor)</p>
           </div>
 
           <div className="flex justify-between items-center border-t border-gray-200 pt-4 mb-6">
