@@ -12,20 +12,20 @@ function SuccessContent() {
 
   useEffect(() => {
     if (orderId) {
-      supabase.from('orders').select('*').eq('id', orderId).single().then(({data}) => setOrder(data));
+      supabase.from('orders').select('order_display_id, account_data').eq('id', orderId).single()
+        .then(({ data }) => setOrder(data));
     }
   }, [orderId]);
 
-  if (!order) return <div className="p-10 text-center">Memuat data pesanan...</div>;
+  if (!order) return <div className="p-10 text-center">Memuat data...</div>;
 
   return (
-    <div className="p-10 text-center max-w-md mx-auto">
-      <h1 className="text-2xl font-bold text-green-600">Pembayaran Berhasil!</h1>
-      <div className="mt-6 bg-gray-50 p-6 rounded-xl border border-dashed">
-        <p className="font-bold text-sm text-gray-500 uppercase">Data Pesanan Anda:</p>
-        <div className="mt-4 break-all bg-white p-4 rounded shadow-inner font-mono text-sm">
-          {order.account_data || "Menunggu pengiriman admin..."}
-        </div>
+    <div className="max-w-sm mx-auto bg-white rounded-3xl shadow-lg p-8 mt-10 text-center">
+      <h1 className="text-2xl font-bold text-green-600">Berhasil!</h1>
+      <p className="mt-4 text-gray-500">Nomor Pesanan:</p>
+      <div className="text-3xl font-black text-purple-700 my-2">{order.order_display_id}</div>
+      <div className="mt-6 p-4 bg-gray-50 rounded-xl break-all">
+        {order.account_data || "Menunggu pengiriman..."}
       </div>
     </div>
   );
