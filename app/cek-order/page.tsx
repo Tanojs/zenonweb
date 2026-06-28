@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import { 
   ArrowLeft, Search, Loader2, Clock, CheckCircle2, 
-  AlertCircle, XCircle, MessageSquare, Copy, Check 
+  AlertCircle, XCircle, Copy, Check 
 } from "lucide-react";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -20,7 +20,6 @@ interface Order {
   product_type: string;
   product_price: number;
   status: "pending" | "proses" | "selesai" | "gagal";
-  panel_username?: string;
 }
 
 export default function CekOrderPage() {
@@ -38,10 +37,13 @@ export default function CekOrderPage() {
     setHasSearched(true);
 
     try {
+      const key = searchKey.trim();
+      
+      // Kueri fleksibel: mencari di WA, ID Sistem (UUID), atau ID Cantik (ORD-XXXX)
       const { data, error } = await supabase
         .from("orders")
         .select("*")
-        .or(`customer_phone.eq.${searchKey.trim()},id.eq.${searchKey.trim()},order_display_id.eq.${searchKey.trim()}`)
+        .or(`customer_phone.ilike.%${key}%,id.eq.${key},order_display_id.ilike.%${key}%`)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -73,7 +75,7 @@ export default function CekOrderPage() {
 
         <form onSubmit={handleSearch} className="bg-card border rounded-2xl p-5 shadow-sm mb-6">
           <label className="block text-xs font-bold uppercase text-muted-foreground mb-2">
-            Masukkan No. WA atau Invoice (Contoh: ORD-1234)
+            Masukkan No. WA atau ID Pesanan (Contoh: ORD-1234)
           </label>
           <div className="flex gap-2">
             <input
@@ -83,13 +85,17 @@ export default function CekOrderPage() {
               placeholder="0857... atau ORD-..."
               className="flex-1 bg-background border rounded-xl px-4 py-3 text-sm outline-none focus:border-[#6C3CE1]"
             />
-            <button type="submit" className="bg-[#6C3CE1] text-white font-bold px-6 rounded-xl">
-              {loading ? <Loader2 className="animate-spin" /> : "Cari"}
+            <button type="submit" className="bg-[#6C3CE1] text-white font-bold px-6 rounded-xl hover:bg-purple-700 transition">
+              {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Cari"}
             </button>
           </div>
         </form>
 
         <div className="space-y-4">
+          {!loading && hasSearched && !results && (
+            <div className="text-center py-10 text-muted-foreground">Data tidak ditemukan.</div>
+          )}
+
           {results?.map((order) => (
             <div key={order.id} className="bg-card border rounded-2xl p-5 shadow-sm">
               <div className="flex justify-between items-center mb-4">
@@ -104,7 +110,7 @@ export default function CekOrderPage() {
                 <span className="text-[10px] font-bold uppercase border px-2 py-1 rounded-lg">{order.status}</span>
               </div>
               <h3 className="text-lg font-bold">{order.product_name}</h3>
-              <p className="text-sm text-muted-foreground mt-2">Harga: Rp {order.product_price.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground mt-2">Total: Rp {order.product_price.toLocaleString()}</p>
             </div>
           ))}
         </div>
