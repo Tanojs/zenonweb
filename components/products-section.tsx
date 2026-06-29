@@ -1,4 +1,3 @@
-Ini coba benerin products-section
 "use client";
 
 import { useState, useEffect } from "react";
